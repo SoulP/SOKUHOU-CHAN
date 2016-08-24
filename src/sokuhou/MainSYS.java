@@ -6,7 +6,7 @@ public class MainSYS {
 		// TODO 自動生成されたメソッド・スタブ
 		System.out.println("1111awdada1");
 	//sys
-		
+		//YAHOO!
 	}
 
 }

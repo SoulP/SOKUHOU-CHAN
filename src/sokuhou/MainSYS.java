@@ -4,7 +4,7 @@ public class MainSYS {
 
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ
-		System.out.println("ABCDefgjjhh");
+		System.out.println("ABCDefgjjhhhjhgujg");
 	}
 
 }

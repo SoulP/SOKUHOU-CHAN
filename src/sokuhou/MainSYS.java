@@ -1,4 +1,4 @@
-package 速報ちゃん;
+package sokuhou;
 
 public class MainSYS {
 

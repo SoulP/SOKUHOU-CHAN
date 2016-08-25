@@ -23,4 +23,9 @@ public class DBA extends Oracle{
 		super(connect, user, password);
 	}
 
+	// 実行処理
+	public void run(){
+
+	}
+
 }

@@ -8,17 +8,22 @@ public class NetWork extends Net{
 	// ネットワーク
 
 	// コンストラクタ
-		public NetWork(){
-			super();
-		}
+	public NetWork(){
+		super();
+	}
 
-		// コンストラクタ(文字列: URLアドレス)
-		public NetWork(String URL){
-			super(URL);
-		}
+	// コンストラクタ(文字列: URLアドレス)
+	public NetWork(String URL){
+		super(URL);
+	}
 
-		// コンストラクタ(文字列の配列: 各URLアドレス)
-		public NetWork(ArrayList<String> listURL){
-			super(listURL);
-		}
+	// コンストラクタ(文字列の配列: 各URLアドレス)
+	public NetWork(ArrayList<String> listURL){
+		super(listURL);
+	}
+
+	// 実行処理
+	public void run(){
+
+	}
 }

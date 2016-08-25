@@ -3,7 +3,7 @@ package sokuhou;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Net {
+public abstract class Net extends Thread {
 	// 抽象クラス
 	private String URL;
 	private List<String> listURL;
@@ -45,4 +45,6 @@ public abstract class Net {
 	public List<String> getListURL(){
 		return listURL;
 	}
+
+	public abstract void run();
 }

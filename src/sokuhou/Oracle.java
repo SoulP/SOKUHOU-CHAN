@@ -1,6 +1,6 @@
 package sokuhou;
 
-public abstract class Oracle {
+public abstract class Oracle extends Thread {
 	// 抽象クラス
 
 	private String connect, user, password;
@@ -59,4 +59,5 @@ public abstract class Oracle {
 		return password;
 	}
 
+	public abstract void run();
 }

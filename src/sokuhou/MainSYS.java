@@ -8,5 +8,7 @@ public class MainSYS {
 		DBA dba = null;
 		IOsys io = null;
 
+		nw = new NetWork();
+
 	}
 }

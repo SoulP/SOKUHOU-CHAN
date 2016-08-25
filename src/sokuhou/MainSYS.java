@@ -4,6 +4,9 @@ public class MainSYS {
 
 	public static void main(String[] args) {
 		// メインシステム
-		System.out.println("AAAA");
+		NetWork nw = null;
+		DBA dba = null;
+		IOsys io = null;
+
 	}
 }

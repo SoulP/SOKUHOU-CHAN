@@ -22,6 +22,5 @@ public class NetWork extends Net{
 
 	// 実行処理
 	public void run(){
-
 	}
 }

@@ -1,7 +1,7 @@
 package sokuhou;
 
 public abstract class Oracle {
-	// Oracle DBA 11g
+	// 抽象クラス
 
 	private String connect, user, password;
 

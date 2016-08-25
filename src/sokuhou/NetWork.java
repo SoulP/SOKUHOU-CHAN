@@ -26,4 +26,24 @@ public class NetWork {
 		URL = "";
 	}
 
+	// 入力: URLアドレス
+	public void setURL(String URL){
+		this.URL = URL;
+	}
+
+	// 出力: URLアドレス
+	public String getURL(){
+		return URL;
+	}
+
+	// 入力: 各URLアドレス
+	public void setListURL(ArrayList<String> listURL){
+		this.listURL = listURL;
+	}
+
+	// 出力: 各URLアドレス
+	public List<String> getListURL(){
+		return listURL;
+	}
+
 }

@@ -58,6 +58,5 @@ public class DBA {
 	public String getPassword(){
 		return password;
 	}
-	//---------ここからプログラムよろしく！----------------------------
 
 }

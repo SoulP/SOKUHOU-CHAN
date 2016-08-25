@@ -5,8 +5,8 @@ import java.util.List;
 
 public class NetWork {
 	// ネットワーク
-	String URL;
-	List<String> listURL;
+	private String URL;
+	private List<String> listURL;
 
 	// コンストラクタ
 	public NetWork(){

@@ -1,12 +1,10 @@
 package sokuhou;
 
-import java.net.*;
-import java.io.*;
 import java.util.ArrayList;
 
 public abstract class NetWork extends Net{
 	// ネットワーク
-//テスト
+//あああああ
 	// コンストラクタ
 	public NetWork(){
 		super();
@@ -35,7 +33,7 @@ public abstract class NetWork extends Net{
 
 		}
 		}
-			
-		
+
+
 
 

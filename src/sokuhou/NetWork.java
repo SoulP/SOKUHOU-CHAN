@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public abstract class NetWork extends Net{
 	// ネットワーク
-//あああああ
+//あああああいいいい
 	// コンストラクタ
 	public NetWork(){
 		super();

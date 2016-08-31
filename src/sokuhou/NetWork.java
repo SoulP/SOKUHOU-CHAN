@@ -32,7 +32,7 @@ public abstract class NetWork extends Net{
 		System.out.println("ニーハオ");//ニーハオと出力
 
 		}
-		}
+	}
 
 
 

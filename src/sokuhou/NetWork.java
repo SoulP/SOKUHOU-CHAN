@@ -2,7 +2,7 @@ package sokuhou;
 
 import java.util.ArrayList;
 
-public abstract class NetWork extends Net{
+public class NetWork extends Net{
 	// ネットワーク
 
 	// コンストラクタ
@@ -20,18 +20,13 @@ public abstract class NetWork extends Net{
 		super(listURL);
 	}
 
+	// コンストラクタ(NetWork: NetWorkオブジェクト)
+	public NetWork(NetWork nw){
+		super(nw);
+	}
+
 	// 実行処理
-	public void run(){
-
-		System.out.println("Hellow Java");//Hellow Javaと出力
-
-
-		System.out.println("こんにちは");//こんにちはと出力
-
-
-		System.out.println("ニーハオ");//ニーハオと出力
-
-		}
+	public void run(){}
 	}
 
 

@@ -26,6 +26,12 @@ public abstract class Net extends Thread {
 		URL = "";
 	}
 
+	// コンストラクタ(NetWork: NetWorkオブジェクト)
+	public Net(NetWork nw){
+		URL = nw.getURL();
+		listURL = nw.getListURL();
+	}
+
 	// 入力: URLアドレス
 	public void setURL(String URL){
 		this.URL = URL;
@@ -46,5 +52,10 @@ public abstract class Net extends Thread {
 		return listURL;
 	}
 
+	public void setNet(Net net){
+		URL = net.getURL();
+		listURL = net.getListURL();
+	}
+	// 抽象: 実行処理
 	public abstract void run();
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class NetWork extends Net{
 	// ネットワーク
 
+	private NetWork nw;
+
 	// コンストラクタ
 	public NetWork(){
 		super();
@@ -25,9 +27,17 @@ public class NetWork extends Net{
 		super(nw);
 	}
 
-	// 実行処理
-	public void run(){}
+	// 入力: NetWorkオブジェクト
+	public void setNet(NetWork nw){
+		super.setNet(nw);
+		this.nw = nw;
 	}
+
+	// 出力: NetWorkオブジェクト
+	public NetWork getNet(){
+		return nw;
+	}
+}
 
 
 

@@ -6,7 +6,7 @@ public class MainSYS {
 		// メインシステム
 		NetWork nw = new NetWork();
 		nw.setURL("http://google.com/");
-		NetGET nGET = new NetGET(nw);
+		NetWork nGET = new NetGET(nw);
 
 		DBA dba = null;
 		IOsys io = null;
@@ -17,7 +17,7 @@ public class MainSYS {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-		nw = nGET.getNet();
+		nw = nGET;
 		System.out.println(nw.getURL());
 	}
 }

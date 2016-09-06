@@ -56,6 +56,4 @@ public abstract class Net extends Thread {
 		URL = net.getURL();
 		listURL = net.getListURL();
 	}
-	// 抽象: 実行処理
-	public abstract void run();
 }

@@ -5,7 +5,7 @@ public class MainSYS {
 	public static void main(String[] args) {
 		// メインシステム
 		NetWork nw = new NetWork();
-		nw.setURL("http://google.com/");
+		nw.setURL("http://google.co.jp/");
 		NetWork nGET = new NetGET(nw);
 
 		DBA dba = null;

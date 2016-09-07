@@ -1,16 +1,19 @@
 package sokuhou;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class NetGET extends NetWork {
 	// URLアドレス先 HTML取得
 
 	// エンコード種類
-	final String sjis = "SHIFT_JIS", utf8 = "UTF-8";
+	final String sjis = "Shift_JIS", utf8 = "UTF-8", jis = "JISAutoDetect";
 
 	// コンストラクタ
 	public NetGET(){}
@@ -38,10 +41,41 @@ public class NetGET extends NetWork {
 		return strArray;
 	}
 
+	// 文字コード確認 UTF-8
+	public static boolean isUTF8(byte[] src)
+    {
+        try {
+            byte[] tmp = new String(src, "UTF8").getBytes("UTF8");
+            return Arrays.equals(tmp, src);
+        }
+        catch(UnsupportedEncodingException e) {
+            return false;
+        }
+    }
+
+	// 文字コード確認 Shift_JIS
+    public static boolean isSJIS(byte[] src)
+    {
+        try {
+            byte[] tmp = new String(src, "Shift_JIS").getBytes("Shift_JIS");
+            return Arrays.equals(tmp, src);
+        }
+        catch(UnsupportedEncodingException e) {
+            return false;
+        }
+    }
+
 	// 実行処理
 	public void run(){
 		try{
-			BufferedReader open = new BufferedReader(new InputStreamReader(new URL(super.getURL()).openStream(), sjis));
+			byte[] src = new byte[1024];
+			String encode;
+			InputStream is = new URL(super.getURL()).openStream();
+			is.read(src);
+			if(isUTF8(src))encode = utf8;
+			else if(isSJIS(src)) encode = sjis;
+			else encode = jis;
+			BufferedReader open = new BufferedReader(new InputStreamReader(is, encode));
 			String str = "";
 			String buff = null;
 			while((buff = open.readLine()) != null){

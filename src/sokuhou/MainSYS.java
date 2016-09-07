@@ -18,6 +18,10 @@ public class MainSYS {
 			e.printStackTrace();
 		}
 		nw = nGET;
-		System.out.println(nw.getURL());
+		System.out.println(nw.getURL()+"\n");
+
+		for(String z : nw.getHTML()){
+			System.out.println(z);
+		}
 	}
 }

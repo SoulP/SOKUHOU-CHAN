@@ -38,7 +38,3 @@ public class NetWork extends Net{
 		return nw;
 	}
 }
-
-
-
-

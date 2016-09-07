@@ -11,28 +11,15 @@ import java.util.List;
 
 public class NetGET extends NetWork {
 	// URLアドレス先 HTML取得
-<<<<<<< HEAD
-	final String sjis = "SHIFT_JIS", utf8 = "UTF-8";
-=======
 
 	// エンコード種類
 	final String sjis = "Shift_JIS", utf8 = "UTF-8", jis = "JISAutoDetect";
->>>>>>> branch 'Head' of https://github.com/SoulP/SOKUHOU-CHAN.git
 
 	// コンストラクタ
-<<<<<<< HEAD
 	public NetGET(){
 	}
-=======
-	public NetGET(){}
->>>>>>> branch 'Head' of https://github.com/SoulP/SOKUHOU-CHAN.git
 
 	// コンストラクタ
-<<<<<<< HEAD
-	public NetGET(NetWork nw){
-		super(nw);
-	}
-=======
 	public NetGET(NetWork nw){super(nw);}
 
 	// 文字列から文字列配列に変換; 入力: 文字列; 出力: 文字列配列
@@ -78,7 +65,6 @@ public class NetGET extends NetWork {
             return false;
         }
     }
->>>>>>> branch 'Head' of https://github.com/SoulP/SOKUHOU-CHAN.git
 
 	// 実行処理
 	public void run(){
@@ -96,11 +82,8 @@ public class NetGET extends NetWork {
 			while((buff = open.readLine()) != null){
 				str += buff;
 			}
-<<<<<<< HEAD
 			super.setURL("YEAH!");
-=======
 			super.setHTML(str2strArray(str));
->>>>>>> branch 'Head' of https://github.com/SoulP/SOKUHOU-CHAN.git
 		}catch(Exception e){
 			System.out.println(e);
 			System.exit(-1);

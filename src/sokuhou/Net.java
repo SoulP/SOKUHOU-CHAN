@@ -61,8 +61,6 @@ public abstract class Net extends Thread {
 	protected void setHTML(List<String> html){
 		this.html = html;
 	}
-<<<<<<< HEAD
-=======
 
 	// 出力: HTML情報
 	public List<String> getHTML(){
@@ -74,5 +72,4 @@ public abstract class Net extends Thread {
 		URL = nw.getURL();
 		listURL = nw.getListURL();
 	}
->>>>>>> branch 'Head' of https://github.com/SoulP/SOKUHOU-CHAN.git
 }

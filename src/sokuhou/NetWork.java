@@ -37,8 +37,12 @@ public class NetWork extends Net{
 	public NetWork getNet(){
 		return nw;
 	}
+<<<<<<< HEAD
 }
 
 
 
 
+=======
+}
+>>>>>>> branch 'Head' of https://github.com/SoulP/SOKUHOU-CHAN.git

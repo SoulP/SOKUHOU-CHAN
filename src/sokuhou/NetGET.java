@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NetGET extends NetWork {
@@ -68,9 +69,9 @@ public class NetGET extends NetWork {
     }
 
     // HTML文のタグの中の値を出力; 入力: HTML文, タグ **<>は不要**; 出力: タグの中にある値
-    public String html2string(List<String> html, String str)
+    public synchronized String html2string(List<String> html, String str)
     {
-    	Pattern p = Pattern.compile("(?i)<*"+str+"*>");
+    	Pattern p = Pattern.compile("(?i)<*" + str + "*>");
     	for(String Str : html){
     		if(p.matcher(Str).matches()){
     			return html.get(html.indexOf(Str)+1);
@@ -79,12 +80,33 @@ public class NetGET extends NetWork {
     	return "";
     }
 
-    // HTML文のmetaタグの中にあるcontentを出力; 入力: HTML文, propertyもしくはname; 出力: content
-    public String meta2string(List<String> html, String str){
-    	Pattern p = Pattern.compile("(?i)<meta *");
-    	//コーディング中...
-
+    /*
+     * HTML文の検索一致したmetaタグの中にあるcontentを出力;
+     * 入力: HTML文, propertyもしくはname, true = property false = name;
+     * 出力: content
+     */
+    private synchronized String meta2string(List<String> html, String str, boolean pn){
+    	Pattern p = Pattern.compile("(?i)" +"<meta.*" + ((pn)?"property":"name") + "=\"" + str + "\".*>");
+    	for(String Str : html){
+    		if(p.matcher(Str).find()){
+    			return getContentFromMeta(Str);
+    		}
+    	}
     	return "";
+    }
+
+    // metaタグの中にあるcotentを出力; 入力: meta; 出力: content
+    private String getContentFromMeta(String str){
+    	try{
+    		Matcher m = Pattern.compile("(?i)content=\".+?\"").matcher(str);
+    		String temp = "";
+    		while(m.find())temp = m.group();
+    		temp = temp.substring(0, temp.length() - 1).substring("content=\"".length());
+    		return temp;
+    	}catch (Exception e){
+    		System.out.println(e);
+    		return "";
+    	}
     }
 
     // 接続先からHTML読込、HTML文出力
@@ -115,7 +137,10 @@ public class NetGET extends NetWork {
 	{
 		try{
 			setHTML(readHTML());
-			setTitle(html2string(getHTML(), "title"));
+			String temp = html2string(getHTML(), "title");
+			temp = (temp.equals(""))? meta2string(getHTML(), "og:title", true) : temp;
+			temp = (temp.equals(""))? meta2string(getHTML(), "title", false) : temp;
+			setTitle(temp);
 		}catch(Exception e){
 			System.out.println(e);
 			System.exit(-1);

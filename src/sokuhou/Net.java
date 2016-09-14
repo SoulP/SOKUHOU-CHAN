@@ -90,10 +90,4 @@ public abstract class Net extends Thread {
     public String getTitle(){
     	return title;
     }
-
-
-	public void setNet(NetWork nw){
-		URL = nw.getURL();
-		listURL = nw.getListURL();
-	}
 }

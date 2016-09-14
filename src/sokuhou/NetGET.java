@@ -82,7 +82,6 @@ public class NetGET extends NetWork {
 			while((buff = open.readLine()) != null){
 				str += buff;
 			}
-			super.setURL("YEAH!");
 			super.setHTML(str2strArray(str));
 		}catch(Exception e){
 			System.out.println(e);

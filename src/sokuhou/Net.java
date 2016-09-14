@@ -12,9 +12,9 @@ public abstract class Net extends Thread {
 	private List<String>	html;// HTML文
 	private String			title;// タイトル
 	private String			site_name;// サイト名
-	private String			description;// 説明
+	private String			description;// 説明文
 	private List<String>	keywords;// キーワード配列
-	private String			type;// ページの種類; トップページ = website | 各ページ = article
+	private String			type;// ページの種類; トップページ = website | 各ページ = article | 他にも色々ある
 	private String			imageURL;// サムネイル画像のURLアドレス
 	private BufferedImage	buffImage;// サムネイル画像
 	private String			iconURL;// アイコンのURLアドレス
@@ -90,4 +90,85 @@ public abstract class Net extends Thread {
     public String getTitle(){
     	return title;
     }
+
+    // 入力: サイト名
+    public void setSiteName(String site_name){
+    	this.site_name = site_name;
+    }
+
+    // 出力: サイト名
+    public String getSiteName(){
+    	return site_name;
+    }
+
+    // 入力: 説明文
+    public void setDescription(String description){
+    	this.description = description;
+    }
+
+    // 出力: 説明文
+    public String getDescription(){
+    	return description;
+    }
+
+    // 入力: キーワード配列
+    public void setKeywords(List<String> keywords){
+    	this.keywords = keywords;
+    }
+
+    // 出力: キーワード配列
+    public List<String> getKeywords(){
+    	return keywords;
+    }
+
+    // 入力: ページの種類
+    public void setType(String type){
+    	this.type = type;
+    }
+
+    // 出力: ページの種類
+    public String getType(){
+    	return type;
+    }
+
+    // 入力: サムネイル画像のURLアドレス
+    public void setImageURL(String imageURL){
+    	this.imageURL = imageURL;
+    }
+
+    // 出力: サムネイル画像のURLアドレス
+    public String getImageURL(){
+    	return imageURL;
+    }
+
+    // 入力: サムネイル画像
+    public void setBuffImage(BufferedImage buffImage){
+    	this.buffImage = buffImage;
+    }
+
+    // 出力: サムネイル画像
+    public BufferedImage getBuffImage(){
+    	return buffImage;
+    }
+
+    // 入力: アイコンのURLアドレス
+    public void setIconURL(String iconURL){
+    	this.iconURL = iconURL;
+    }
+
+    // 出力: アイコンのURLアドレス
+    public String getIconURL(){
+    	return iconURL;
+    }
+
+    // 入力: アイコン
+    public void setBuffIcon(BufferedImage buffIcon){
+    	this.buffIcon = buffIcon;
+    }
+
+    // 出力: アイコン
+    public BufferedImage getBuffIcon(){
+    	return buffIcon;
+    }
+
 }

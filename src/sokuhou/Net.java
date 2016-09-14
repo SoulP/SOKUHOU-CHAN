@@ -5,10 +5,13 @@ import java.util.List;
 
 public abstract class Net extends Thread {
 	// 抽象クラス
-	private String URL;
-	private List<String> listURL;
-	private List<String> html;
-	private String title;
+	private String URL;// URLアドレス接続先
+	private List<String> listURL;// URLアドレス配列
+	private List<String> html;// HTML文
+	private String title;// タイトル
+	private String description;// 説明
+	private String imageURL;// 画像(ロゴやアイコンなど)のURLアドレス
+
 
 	// コンストラクタ
 	public Net(){

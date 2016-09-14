@@ -111,23 +111,34 @@ public class NetGET extends NetWork {
 
     // 接続先からHTML読込、HTML文出力
     private List<String> readHTML(){
+    	InputStream is = null;
+    	InputStreamReader isr = null;
     	try{
     		byte[] src = new byte[Byte.MAX_VALUE-1];
 			String encode;
-			InputStream is = new URL(getURL()).openStream();
+			is = new URL(getURL()).openStream();
 			is.read(src);
 			if(isUTF8(src))encode = utf8;
 			else if(isSJIS(src)) encode = sjis;
 			else encode = jis;
-			BufferedReader open = new BufferedReader(new InputStreamReader(new URL(getURL()).openStream(), encode));
+			isr = new InputStreamReader(new URL(getURL()).openStream(), encode);
+			BufferedReader open = new BufferedReader(isr);
 			String str = "";
 			String buff = null;
 			while((buff = open.readLine()) != null){
 				str += buff;
 			}
+			is.close();
+			isr.close();
 			return str2strArray(str);
     	}catch (Exception e){
     		System.out.println(e);
+    		try{
+    			is.close();
+    			isr.close();
+    		}catch (Exception ex){
+    			System.out.println(ex);
+    		}
     		return null;
     	}
     }

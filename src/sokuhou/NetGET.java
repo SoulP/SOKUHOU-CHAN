@@ -68,7 +68,7 @@ public class NetGET extends NetWork {
     // HTML文のタグの中の値を出力; 入力: HTML文, タグ **<>は不要**; 出力: タグの中にある値
     public String html2string(List<String> html, String str)
     {
-    	Pattern p = Pattern.compile("(?i)<*" + str + "*>");
+    	Pattern p = Pattern.compile("(?i)<.*" + str + ".*>");
     	for(String Str : html){
     		if(p.matcher(Str).matches()){
     			return html.get(html.indexOf(Str)+1);

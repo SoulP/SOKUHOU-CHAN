@@ -46,7 +46,7 @@ public class NetGET extends NetWork {
 	public static boolean isUTF8(byte[] src)
     {
         try {
-            byte[] tmp = new String(src, "UTF8").getBytes("UTF8");
+            byte[] tmp = new String(src, "UTF-8").getBytes("UTF-8");
             return Arrays.equals(tmp, src);
         }
         catch(UnsupportedEncodingException e) {
@@ -73,9 +73,11 @@ public class NetGET extends NetWork {
 			String encode;
 			InputStream is = new URL(super.getURL()).openStream();
 			is.read(src);
-			if(isUTF8(src))encode = utf8;
-			else if(isSJIS(src)) encode = sjis;
+			if(isSJIS(src))encode = sjis;
+			else if(isUTF8(src)) encode = utf8;
 			else encode = jis;
+			System.out.println(isSJIS(src));
+			System.out.println(isUTF8(src));
 			BufferedReader open = new BufferedReader(new InputStreamReader(is, encode));
 			String str = "";
 			String buff = null;

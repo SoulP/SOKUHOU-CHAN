@@ -69,7 +69,7 @@ public class NetGET extends NetWork {
     }
 
     // HTML文のタグの中の値を出力; 入力: HTML文, タグ **<>は不要**; 出力: タグの中にある値
-    public synchronized String html2string(List<String> html, String str)
+    public String html2string(List<String> html, String str)
     {
     	Pattern p = Pattern.compile("(?i)<*" + str + "*>");
     	for(String Str : html){
@@ -85,7 +85,7 @@ public class NetGET extends NetWork {
      * 入力: HTML文, propertyもしくはname, true = property false = name;
      * 出力: content
      */
-    private synchronized String meta2string(List<String> html, String str, boolean pn){
+    private String meta2string(List<String> html, String str, boolean pn){
     	Pattern p = Pattern.compile("(?i)" +"<meta.*" + ((pn)?"property":"name") + "=\"" + str + "\".*>");
     	for(String Str : html){
     		if(p.matcher(Str).find()){
@@ -110,7 +110,7 @@ public class NetGET extends NetWork {
     }
 
     // 接続先からHTML読込、HTML文出力
-    private synchronized List<String> readHTML(){
+    private List<String> readHTML(){
     	try{
     		byte[] src = new byte[Byte.MAX_VALUE-1];
 			String encode;
@@ -132,6 +132,14 @@ public class NetGET extends NetWork {
     	}
     }
 
+	// タイトル入手
+    private void setTitle(){
+    	String temp = html2string(getHTML(), "title");
+		temp = (temp.equals(""))? meta2string(getHTML(), "og:title", true) : temp;
+		temp = (temp.equals(""))? meta2string(getHTML(), "title", false) : temp;
+		setTitle(temp);
+    }
+
 	// 実行処理
 	public void run()
 	{
@@ -140,7 +148,7 @@ public class NetGET extends NetWork {
 			String temp = html2string(getHTML(), "title");
 			temp = (temp.equals(""))? meta2string(getHTML(), "og:title", true) : temp;
 			temp = (temp.equals(""))? meta2string(getHTML(), "title", false) : temp;
-			setTitle(temp);
+			setTitle();
 		}catch(Exception e){
 			System.out.println(e);
 			System.exit(-1);

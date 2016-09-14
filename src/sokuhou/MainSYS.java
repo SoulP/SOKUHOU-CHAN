@@ -5,7 +5,7 @@ public class MainSYS {
 	public static void main(String[] args) {
 		// メインシステム
 		NetWork nw = new NetWork();
-		nw.setURL("http://google.com/");
+		nw.setURL("http://qiita.com/taiyop/items/050c6749fb693dae8f82");
 		NetWork nGET = new NetGET(nw);
 
 		DBA dba = null;
@@ -23,5 +23,6 @@ public class MainSYS {
 		for(String z : nw.getHTML()){
 			System.out.println(z);
 		}
+		System.out.println(nw.getTitle());
 	}
 }

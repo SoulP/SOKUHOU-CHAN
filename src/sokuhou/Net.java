@@ -8,6 +8,7 @@ public abstract class Net extends Thread {
 	private String URL;
 	private List<String> listURL;
 	private List<String> html;
+	private String title;
 
 	// コンストラクタ
 	public Net(){
@@ -66,6 +67,16 @@ public abstract class Net extends Thread {
 	public List<String> getHTML(){
 		return html;
 	}
+
+    // 入力: タイトル
+    public void setTitle(String title){
+    	this.title = title;
+    }
+
+    // 出力: タイトル
+    public String getTitle(){
+    	return title;
+    }
 
 
 	public void setNet(NetWork nw){

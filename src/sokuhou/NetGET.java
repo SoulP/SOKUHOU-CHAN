@@ -145,9 +145,6 @@ public class NetGET extends NetWork {
 	{
 		try{
 			setHTML(readHTML());
-			String temp = html2string(getHTML(), "title");
-			temp = (temp.equals(""))? meta2string(getHTML(), "og:title", true) : temp;
-			temp = (temp.equals(""))? meta2string(getHTML(), "title", false) : temp;
 			setTitle();
 		}catch(Exception e){
 			System.out.println(e);

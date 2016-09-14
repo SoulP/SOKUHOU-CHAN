@@ -1,17 +1,27 @@
 package sokuhou;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+//抽象クラス
 public abstract class Net extends Thread {
-	// 抽象クラス
-	private String URL;// URLアドレス接続先
-	private List<String> listURL;// URLアドレス配列
-	private List<String> html;// HTML文
-	private String title;// タイトル
-	private String description;// 説明
-	private String imageURL;// 画像(ロゴやアイコンなど)のURLアドレス
 
+	private String			URL;// URLアドレス接続先
+	private List<String>	listURL;// URLアドレス配列
+	private List<String>	html;// HTML文
+	private String			title;// タイトル
+	private String			site_name;// サイト名
+	private String			description;// 説明
+	private List<String>	keywords;// キーワード配列
+	private String			type;// ページの種類; トップページ = website | 各ページ = article
+	private String			imageURL;// サムネイル画像のURLアドレス
+	private BufferedImage	buffImage;// サムネイル画像
+	private String			iconURL;// アイコンのURLアドレス
+	private BufferedImage	buffIcon;// アイコン
+
+	// エンコード種類
+	final String sjis = "Shift_JIS", utf8 = "UTF-8", jis = "JISAutoDetect";
 
 	// コンストラクタ
 	public Net(){

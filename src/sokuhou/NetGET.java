@@ -14,9 +14,6 @@ import java.util.regex.Pattern;
 public class NetGET extends NetWork {
 	// URLアドレス先 HTML取得
 
-	// エンコード種類
-	final String sjis = "Shift_JIS", utf8 = "UTF-8", jis = "JISAutoDetect";
-
 	// コンストラクタ
 	public NetGET(){ super(); }
 

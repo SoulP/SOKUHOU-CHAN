@@ -83,6 +83,7 @@ public class NetGET extends NetWork {
     public String meta2string(List<String> html, String str){
     	Pattern p = Pattern.compile("(?i)<meta *");
     	//コーディング中...
+
     	return "";
     }
 
@@ -96,7 +97,7 @@ public class NetGET extends NetWork {
 			if(isUTF8(src))encode = utf8;
 			else if(isSJIS(src)) encode = sjis;
 			else encode = jis;
-			BufferedReader open = new BufferedReader(new InputStreamReader(is, encode));
+			BufferedReader open = new BufferedReader(new InputStreamReader(new URL(getURL()).openStream(), encode));
 			String str = "";
 			String buff = null;
 			while((buff = open.readLine()) != null){

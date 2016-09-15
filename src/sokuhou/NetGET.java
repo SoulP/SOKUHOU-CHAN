@@ -1,5 +1,6 @@
 package sokuhou;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 public class NetGET extends NetWork {
 	// URLアドレス先 HTML取得
@@ -195,6 +198,20 @@ public class NetGET extends NetWork {
     }
 
     // サムネイル画像取得
+    private void setBuffImage(){
+    	if(!getImageURL().equals("")){
+    		BufferedImage buffImage = null;
+    		try{
+    			buffImage = ImageIO.read(new URL(getImageURL()).openStream());
+    			setBuffImage(buffImage);
+    		}catch (Exception e){
+    			System.out.println(e);
+    			setBuffImage(null);
+    		}
+    	}else{
+    		setBuffImage(null);
+    	}
+    }
 
     // アイコンのURLアドレス取得
     private void setIconURL(List<String> html, String str){
@@ -214,6 +231,20 @@ public class NetGET extends NetWork {
     }
 
     // アイコン取得
+    private void setBuffIcon(){
+    	if(!getIconURL().equals("")){
+    		BufferedImage buffIcon = null;
+    		try{
+    			buffIcon = ImageIO.read(new URL(getIconURL()).openStream());
+    			setBuffIcon(buffIcon);
+    		}catch (Exception e){
+    			System.out.println(e);
+    			setBuffIcon(null);
+    		}
+    	}else{
+    		setBuffIcon(null);
+    	}
+    }
 
 	// 実行処理
 	public void run()
@@ -225,10 +256,11 @@ public class NetGET extends NetWork {
 			setDescription();
 			setKeywords();
 			setSiteName();
-			//setKeywords();
 			setType();
 			setImageURL();
 			setIconURL(getHTML(), "icon");
+			setBuffImage();
+			setBuffIcon();
 		}catch(Exception e){
 			System.out.println(e);
 			System.exit(-1);

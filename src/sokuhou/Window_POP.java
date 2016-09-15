@@ -1,6 +1,7 @@
 package sokuhou;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
@@ -8,6 +9,7 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 public class Window_POP extends JFrame {
+	public Image img;
 	Dimension screenSize;
 	Dimension traySize;
 	Point location;

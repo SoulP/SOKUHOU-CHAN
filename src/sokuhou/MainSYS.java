@@ -44,6 +44,5 @@ public class MainSYS {
 		System.out.println("ページの種類: " + nw.getType());
 		System.out.println("サムネイル画像のURLアドレス: " + nw.getImageURL());
 		System.out.println("アイコンのURLアドレス: " + nw.getIconURL());
-
 	}
 }

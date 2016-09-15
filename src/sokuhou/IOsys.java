@@ -9,7 +9,6 @@ public class IOsys extends IO{
 	public IOsys(){
 		window = new Window();
 		winPOP = new Window_POP();
-		winPOP.setVisible(true);
 	}
 
 }

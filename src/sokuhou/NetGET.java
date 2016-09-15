@@ -21,7 +21,7 @@ public class NetGET extends NetWork {
 	public NetGET(NetWork nw){ super(nw); }
 
 	// 文字列から文字列配列に変換; 入力: 文字列; 出力: 文字列配列
-	public List<String> str2strArray(String str)
+	private List<String> str2strArray(String str)
 	{
 		List<String> strArray = new ArrayList<String>();
 		int a = 0;
@@ -63,6 +63,15 @@ public class NetGET extends NetWork {
         catch(UnsupportedEncodingException e) {
             return false;
         }
+    }
+
+    // ドメイン名取得
+    private void setDomain(){
+    	String temp = "";
+    	Matcher m = Pattern.compile("(?i)http://.+?/").matcher(getURL());
+    	while(m.find())temp = m.group();
+    	temp = temp.substring(0, temp.length() - 1).substring("http://".length());
+    	setDomain(temp);
     }
 
     // HTML文のタグの中の値を出力; 入力: HTML文, タグ **<>は不要**; 出力: タグの中にある値
@@ -140,7 +149,7 @@ public class NetGET extends NetWork {
     	}
     }
 
-	// タイトル入手
+	// タイトル取得
     private void setTitle(){
     	String temp = html2string(getHTML(), "title");
 		temp = (temp.equals(""))? meta2string(getHTML(), "og:title", true) : temp;
@@ -148,12 +157,65 @@ public class NetGET extends NetWork {
 		setTitle(temp);
     }
 
+    // サイト名取得
+    private void setSiteName(){
+    	String temp = meta2string(getHTML(), "og:site_name", true);
+    	setSiteName(temp);
+    }
+
+    // 説明文取得
+    private void setDescription(){
+    	String temp = meta2string(getHTML(), "description", false);
+    	temp = (temp.equals(""))? meta2string(getHTML(), "og:description", true) : temp;
+    	setDescription(temp);
+    }
+
+    // キーワード取得
+
+    // ページの種類取得
+    private void setType(){
+    	String temp = meta2string(getHTML(), "og:type", true);
+    	setType(temp);
+    }
+
+    // サムネイル画像のURLアドレス取得
+    private void setImageURL(){
+    	String temp = meta2string(getHTML(), "og:image", true);
+    	setImageURL(temp);
+    }
+
+    // サムネイル画像取得
+
+    // アイコンのURLアドレス取得
+    private void setIconURL(List<String> html, String str){
+    	String  temp = "";
+    	setIconURL(temp);
+    	Pattern p    = Pattern.compile("(?i)<link.*rel=\".*" + str + "\".*>");
+    	for(String Str : html){
+    		if(p.matcher(Str).matches()){
+    			Matcher m = Pattern.compile("(?i)href=\".+?\"").matcher(Str);
+    			while(m.find())temp = m.group();
+    			temp = temp.substring(0, temp.length() - 1).substring("href=\"".length());
+    			if(temp.startsWith("/"))temp = "http://" + getDomain() + temp;
+    			setIconURL(temp);
+    			break;
+    		}
+    	}
+    }
+
 	// 実行処理
 	public void run()
 	{
 		try{
+			setDomain();
 			setHTML(readHTML());
 			setTitle();
+			setDescription();
+			setSiteName();
+			//setKeywords();
+			setType();
+			setImageURL();
+			setIconURL(getHTML(), "icon");
 		}catch(Exception e){
 			System.out.println(e);
 			System.exit(-1);

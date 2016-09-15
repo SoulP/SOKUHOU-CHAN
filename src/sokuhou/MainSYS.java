@@ -26,7 +26,15 @@ public class MainSYS {
 		for(String z : nw.getHTML()){
 			System.out.println(z);
 		}
-		// テスト; タイトル出力
-		System.out.println("\n" + nw.getTitle());
+		// テスト; 出力
+		System.out.println("--------------------------------------");
+		System.out.println("URLアドレス: " + nw.getURL());
+		System.out.println("ドメイン名: " + nw.getDomain());
+		System.out.println("タイトル: " + nw.getTitle());
+		System.out.println("サイト名: " + nw.getSiteName());
+		System.out.println("説明: " + nw.getDescription());
+		System.out.println("ページの種類: " + nw.getType());
+		System.out.println("サムネイル画像のURLアドレス: " + nw.getImageURL());
+		System.out.println("アイコンのURLアドレス: " + nw.getIconURL());
 	}
 }

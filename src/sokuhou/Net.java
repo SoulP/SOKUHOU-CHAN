@@ -9,6 +9,7 @@ public abstract class Net extends Thread {
 
 	private String			URL;// URLアドレス接続先
 	private List<String>	listURL;// URLアドレス配列
+	private String			domain;// ドメイン名
 	private List<String>	html;// HTML文
 	private String			title;// タイトル
 	private String			site_name;// サイト名
@@ -69,6 +70,16 @@ public abstract class Net extends Thread {
 	// 出力: 各URLアドレス
 	public List<String> getListURL(){
 		return listURL;
+	}
+
+	// 入力: ドメイン名
+	public void setDomain(String domain){
+		this.domain = domain;
+	}
+
+	// 出力: ドメイン名
+	public String getDomain(){
+		return domain;
 	}
 
 	// 入力: HTML情報

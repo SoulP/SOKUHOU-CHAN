@@ -83,7 +83,7 @@ public abstract class Net extends Thread {
 	}
 
 	// 入力: HTML情報
-	protected void setHTML(List<String> html){
+	public void setHTML(List<String> html){
 		this.html = html;
 	}
 

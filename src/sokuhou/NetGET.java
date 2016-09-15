@@ -171,6 +171,15 @@ public class NetGET extends NetWork {
     }
 
     // キーワード取得
+    private void setKeywords(){
+    	String temp = meta2string(getHTML(), "keywords", false);
+    	List<String> tempList = new ArrayList<String>();
+    	String tempArray[] = temp.split(",");
+    	for(String Str : tempArray){
+    		tempList.add(Str);
+    	}
+    	setKeywords(tempList);
+    }
 
     // ページの種類取得
     private void setType(){
@@ -181,6 +190,7 @@ public class NetGET extends NetWork {
     // サムネイル画像のURLアドレス取得
     private void setImageURL(){
     	String temp = meta2string(getHTML(), "og:image", true);
+    	if(temp.startsWith("/"))temp = "http://" + getDomain() + temp;
     	setImageURL(temp);
     }
 
@@ -203,6 +213,8 @@ public class NetGET extends NetWork {
     	}
     }
 
+    // アイコン取得
+
 	// 実行処理
 	public void run()
 	{
@@ -211,6 +223,7 @@ public class NetGET extends NetWork {
 			setHTML(readHTML());
 			setTitle();
 			setDescription();
+			setKeywords();
 			setSiteName();
 			//setKeywords();
 			setType();

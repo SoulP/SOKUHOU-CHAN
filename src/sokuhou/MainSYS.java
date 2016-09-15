@@ -10,6 +10,7 @@ public class MainSYS {
 
 		DBA dba = null;
 		IOsys io = null;
+		// テスト-------------------------------------
 		// テスト; 接続開始
 		nGET.start();
 		try {
@@ -31,8 +32,14 @@ public class MainSYS {
 		System.out.println("URLアドレス: " + nw.getURL());
 		System.out.println("ドメイン名: " + nw.getDomain());
 		System.out.println("タイトル: " + nw.getTitle());
-		System.out.println("サイト名: " + nw.getSiteName());
 		System.out.println("説明: " + nw.getDescription());
+		System.out.print("キーワード: ");
+		for(String Str : nw.getKeywords()){
+			if(Str.equals(""))break;
+			System.out.print(Str + ", ");
+		}
+		System.out.println();
+		System.out.println("サイト名: " + nw.getSiteName());
 		System.out.println("ページの種類: " + nw.getType());
 		System.out.println("サムネイル画像のURLアドレス: " + nw.getImageURL());
 		System.out.println("アイコンのURLアドレス: " + nw.getIconURL());

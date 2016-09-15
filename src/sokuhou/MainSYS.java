@@ -9,7 +9,8 @@ public class MainSYS {
 		NetWork nGET = new NetGET(nw);
 
 		DBA dba = null;
-		IOsys io = null;
+		IOsys io = new IOsys();
+
 		// テスト-------------------------------------
 		// テスト; 接続開始
 		nGET.start();

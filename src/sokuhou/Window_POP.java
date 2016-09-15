@@ -20,5 +20,6 @@ public class Window_POP extends JFrame {
 		location = new Point();
 		location.setLocation(screenSize.width - getWidth(), screenSize.height - getHeight() - (int)(traySize.getHeight()*2.5));;
 		setLocation(location);
+		setResizable(false);
 	}
 }

@@ -1,17 +1,15 @@
 package sokuhou;
 
-import javax.swing.JFrame;
-
 //Input / Output (入出力)
 public class IOsys extends IO{
 
-	private JFrame jFrame;
+	public Window window;
+	public Window_POP winPOP;
 
 	public IOsys(){
-		jFrame = new JFrame();
-		jFrame.setTitle("TEST_テスト");
-		jFrame.setBounds(100, 100, 640, 360);
-		jFrame.setVisible(true);
+		window = new Window();
+		winPOP = new Window_POP();
+		winPOP.setVisible(true);
 	}
 
 }

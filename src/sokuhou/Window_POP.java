@@ -25,7 +25,9 @@ public class Window_POP extends JFrame {
 		screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		traySize = SystemTray.getSystemTray().getTrayIconSize();
 		location = new Point();
-		location.setLocation(screenSize.width - getWidth(), screenSize.height - getHeight() - (int)(traySize.getHeight()*2.5));;
+		location.setLocation(screenSize.width - getWidth(), screenSize.height - getHeight() - (int)(traySize.getHeight() * 2.5));;
+		System.out.println(Toolkit.getDefaultToolkit().getScreenResolution());
+		System.out.println(traySize);
 		setLocation(location);
 		setResizable(false);
 		oPanel = new OPanel();

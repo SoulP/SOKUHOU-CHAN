@@ -17,7 +17,6 @@ public class IOsys extends IO{
 	public SystemTray tray;
 	public GraphicsEnvironment env;
 
-
 	public IOsys(){
 		window = new Window();
 		winPOP = new Window_POP();

@@ -4,31 +4,32 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
-import java.awt.geom.Rectangle2D;
 
 //Input / Output (入出力)
 public class IOsys extends IO{
 
 	public Window window;
 	public Window_POP winPOP;
+	private Dimension screenSizeFull;
 	private Dimension screenSize;
-	private Rectangle2D frameSize;
 	public Toolkit tk;
 	public SystemTray tray;
 	public GraphicsEnvironment env;
 
+	// コンストラクタ
 	public IOsys(){
 		window = new Window();
 		winPOP = new Window_POP();
 		tk = Toolkit.getDefaultToolkit();
 		tray = (SystemTray.isSupported())? SystemTray.getSystemTray() : null;
 		env = (!GraphicsEnvironment.isHeadless())? GraphicsEnvironment.getLocalGraphicsEnvironment() : null;
+		screenSizeFull = (env != null)? env.getDefaultScreenDevice().getDefaultConfiguration().getBounds().getSize(): null;
+		screenSize = (env != null)? env.getMaximumWindowBounds().getBounds().getSize(): null;
+		System.out.println(screenSizeFull);
+		System.out.println(screenSize);
 	}
 
-	public void setWinPOP(Window_POP winPOP){
-		this.winPOP = winPOP;
-	}
-
+	// 出力: デスクトップ画面サイズ
 	public Dimension getScreenSize() {
 		return screenSize;
 	}
@@ -42,17 +43,11 @@ public class IOsys extends IO{
 	}
 
 
-	public Rectangle2D getFrameSize() {
-		return frameSize;
+	public Dimension getScreenSizeFull() {
+		return screenSizeFull;
 	}
 
-	public int getFrameWidth(){
-		return new Double(frameSize.getWidth()).intValue();
-	}
 
-	public int getFrameHeight(){
-		return new Double(frameSize.getHeight()).intValue();
-	}
 
 }
 

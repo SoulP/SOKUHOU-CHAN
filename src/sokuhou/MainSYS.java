@@ -47,5 +47,15 @@ public class MainSYS {
 		io.winPOP.setImage2Panel(nw.getBuffImage());
 		io.winPOP.setViewImagePanel(true);
 		io.winPOP.setVisible(true);
+
+		/* システムトレイアイコン(タスクバー)
+		TrayIcon icon = new TrayIcon(nw.getBuffImage());
+		try {
+			SystemTray.getSystemTray().add(icon);
+		} catch (AWTException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		*/
 	}
 }

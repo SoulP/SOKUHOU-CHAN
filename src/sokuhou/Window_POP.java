@@ -1,11 +1,10 @@
 package sokuhou;
 
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
-import java.awt.Point;
-import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.JFrame;
 
@@ -13,22 +12,16 @@ import javax.swing.JFrame;
 public class Window_POP extends JFrame {
 	private Image img;
 	private OPanel oPanel, imgPanel;
-	Dimension screenSize;
-	Dimension traySize;
-	Point location;
+	Toolkit tk;
 
 	// コンストラクタ
 	public Window_POP(){
 		setTitle("速報");
 		setUndecorated(true);
 		setSize(300, 100);
-		screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		traySize = SystemTray.getSystemTray().getTrayIconSize();
-		location = new Point();
-		location.setLocation(screenSize.width - getWidth(), screenSize.height - getHeight() - (int)(traySize.getHeight() * 2.5));;
-		System.out.println(Toolkit.getDefaultToolkit().getScreenResolution());
-		System.out.println(traySize);
-		setLocation(location);
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Rectangle2D frame = env.getMaximumWindowBounds().getFrame();
+		setLocation(new Double(frame.getWidth()).intValue() - getWidth(), new Double(frame.getHeight()).intValue() - getHeight());
 		setResizable(false);
 		oPanel = new OPanel();
 		imgPanel = new OPanel();

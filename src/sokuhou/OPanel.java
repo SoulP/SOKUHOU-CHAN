@@ -10,7 +10,6 @@ public class OPanel extends JPanel {
 	private boolean viewImage;
 
 	public OPanel(){
-		setSize(100, 100);
 		img = null;
 		viewImage = false;
 	}

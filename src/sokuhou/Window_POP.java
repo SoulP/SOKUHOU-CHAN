@@ -25,6 +25,8 @@ public class Window_POP extends JFrame {
 		setLocation(location);
 		setResizable(false);
 		oPanel = new OPanel();
+		int temp = Math.min(getWidth(), getHeight());
+		oPanel.setSize(temp, temp);
 		add(oPanel);
 	}
 

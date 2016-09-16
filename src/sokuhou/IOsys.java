@@ -25,8 +25,6 @@ public class IOsys extends IO{
 		env = (!GraphicsEnvironment.isHeadless())? GraphicsEnvironment.getLocalGraphicsEnvironment() : null;
 		screenSizeFull = (env != null)? env.getDefaultScreenDevice().getDefaultConfiguration().getBounds().getSize(): null;
 		screenSize = (env != null)? env.getMaximumWindowBounds().getBounds().getSize(): null;
-		System.out.println(screenSizeFull);
-		System.out.println(screenSize);
 	}
 
 	// 出力: デスクトップ画面サイズ

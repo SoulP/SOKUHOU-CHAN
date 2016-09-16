@@ -1,21 +1,29 @@
 package sokuhou;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.JPanel;
 
+// 通知フレームのパネル
 public class OPanel extends JPanel {
 	private Image img;
 	private int imgWidth, imgHeight;
-	private boolean viewImage;
+	private boolean viewImage, viewBackgroundColor;
+	private Color color;
 
 	public OPanel(){
 		img = null;
-		viewImage = false;
+		viewImage = viewBackgroundColor = false;
+		color = Color.DARK_GRAY;
 	}
 
 	public void paint(Graphics g){
+		if(viewBackgroundColor){
+			g.setColor(color);
+			g.fillRect(getX(), getY(), getWidth(), getHeight());
+		}
 		if(img != null && viewImage)g.drawImage(img, 0, 0, imgWidth, imgHeight, null);
 	}
 
@@ -54,6 +62,22 @@ public class OPanel extends JPanel {
 	public void setImageSize(int imgWidth, int imgHeight){
 		this.imgWidth = imgWidth;
 		this.imgHeight = imgHeight;
+	}
+
+	public void setBackgroundColor(Color color){
+		this.color = color;
+	}
+
+	public Color getBackgroundColor(){
+		return color;
+	}
+
+	public void setViewBackgroundColor(boolean viewBackgroundColor){
+		this.viewBackgroundColor = viewBackgroundColor;
+	}
+
+	public boolean isViewBackgroundColor(){
+		return viewBackgroundColor;
 	}
 
 }

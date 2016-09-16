@@ -2,7 +2,10 @@ package sokuhou;
 
 import javax.swing.JFrame;
 
+// メインフレーム
 public class Window extends JFrame {
+
+	// コンストラクタ
 	public Window(){
 		setTitle("速報ちゃん");
 		setSize(640, 360);

@@ -11,5 +11,9 @@ public class IOsys extends IO{
 		winPOP = new Window_POP();
 	}
 
+	public void setWinPOP(Window_POP winPOP){
+		this.winPOP = winPOP;
+	}
+
 }
 

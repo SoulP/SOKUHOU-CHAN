@@ -27,24 +27,15 @@ public class IOsys extends IO{
 		screenSize = (env != null)? env.getMaximumWindowBounds().getBounds().getSize(): null;
 	}
 
-	// 出力: デスクトップ画面サイズ
-	public Dimension getScreenSize() {
-		return screenSize;
-	}
-
-	public int getScreenWidth(){
-		return new Double(screenSize.getWidth()).intValue();
-	}
-
-	public int getScreenHeight(){
-		return new Double(screenSize.getHeight()).intValue();
-	}
-
-
+	// 出力: フルスクリーンサイズ
 	public Dimension getScreenSizeFull() {
 		return screenSizeFull;
 	}
 
+	// 出力: デスクトップ画面サイズ
+	public Dimension getScreenSize() {
+		return screenSize;
+	}
 
 
 }

@@ -1,8 +1,5 @@
 package sokuhou;
 
-import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 public class MainSYS {
 
 	public static void main(String[] args) {
@@ -60,6 +57,7 @@ public class MainSYS {
 			e.printStackTrace();
 		}
 		*/
+		/* ワンタイムパスワード
 		GoogleAuthenticator gAuth = new GoogleAuthenticator();
 	    final GoogleAuthenticatorKey key = gAuth.createCredentials();
 	    System.out.println(key.getKey());
@@ -80,5 +78,6 @@ public class MainSYS {
 	    		time = true;
 	    	}
 	    }
+	    */
 	}
 }

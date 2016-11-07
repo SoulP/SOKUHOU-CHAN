@@ -1,5 +1,8 @@
 package sokuhou;
 
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 public class MainSYS {
 
 	public static void main(String[] args) {
@@ -57,5 +60,25 @@ public class MainSYS {
 			e.printStackTrace();
 		}
 		*/
+		GoogleAuthenticator gAuth = new GoogleAuthenticator();
+	    final GoogleAuthenticatorKey key = gAuth.createCredentials();
+	    System.out.println(key.getKey());
+	    System.out.println(key.getScratchCodes());
+	    System.out.println();
+	    GoogleAuthenticatorQRGenerator qr = new GoogleAuthenticatorQRGenerator();
+	    System.out.println(qr.getOtpAuthURL("速報ちゃん", "ユーザ名", key));
+	    System.out.println();
+	    System.out.println(gAuth.getTotpPassword(key.getKey()));
+
+	    boolean time = true;
+	    while(true){
+	    	if(System.currentTimeMillis()%30000 == 0 && time){
+	    		System.out.println(gAuth.getTotpPassword(key.getKey()));
+	    		time = false;
+	    	}
+	    	if(System.currentTimeMillis()%30000 != 0 && !time){
+	    		time = true;
+	    	}
+	    }
 	}
 }

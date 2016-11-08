@@ -79,5 +79,18 @@ public class MainSYS {
 	    	}
 	    }
 	    */
+		/*
+		byte[] b = new byte[2];
+		int x = 9627;
+		b[0] = (byte)(x & 0xFF);
+		b[1] = (byte)(x >>> 8);
+		System.out.println(x);
+		System.out.printf("%X%X\n",b[1],b[0]);
+		int y = 0;
+		y = b[1] & 0xFF;
+		y = y << 8;
+		y += b[0] & 0xFF;
+		System.out.println(y);
+		*/
 	}
 }

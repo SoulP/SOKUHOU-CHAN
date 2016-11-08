@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 public abstract class JSocket extends Thread{
@@ -79,7 +80,7 @@ public abstract class JSocket extends Thread{
 
 	public byte[] createDataBytes(String str){
 		try {
-			byte[] buffStr = str.getBytes("UTF-8");
+			byte[] buffStr = str2byteArray(str);
 			byte[] buff = new byte[buffStr.length + 4];
 			clearBytes(buff);
 			for(int i = 0; i < buffStr.length; i++) buff[i] = buffStr[i];
@@ -156,6 +157,24 @@ public abstract class JSocket extends Thread{
 
 	public byte[] getBufferBytes(){
 		return bufferData;
+	}
+
+	public byte[] str2byteArray(String str){
+		try {
+			return str.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			System.out.println(e);
+			return null;
+		}
+	}
+
+	public String byteArray2str(byte[] bytes){
+		try {
+			return new String(bytes, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			System.out.println(e);
+			return null;
+		}
 	}
 
 

@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.crypto.SecretKey;
 
 public abstract class JSocket extends Thread{
 	final int port;
@@ -19,8 +23,9 @@ public abstract class JSocket extends Thread{
 	private byte[] iData;
 	private byte[] bData;
 	private byte[] allData;
-	private byte[] bufferData;
+	byte[] bufferData;
 	String sData;
+	SecretKey key;
 
 	public JSocket(){
 		port = 55324;
@@ -28,9 +33,11 @@ public abstract class JSocket extends Thread{
 		iData = new byte[ 4 ];
 		bData = new byte[ 1024 - iData.length ];
 		allData = new byte[ iData.length + bData.length ];
+		bufferData = new byte[Byte.MAX_VALUE - 1];
 		clearBytes(iData);
 		clearBytes(bData);
 		clearBytes(allData);
+		clearBytes(bufferData);
 		sData = null;
 		socket = null;
 		dos = null;
@@ -78,24 +85,40 @@ public abstract class JSocket extends Thread{
 		allData = z;
 	}
 
-	public byte[] createDataBytes(String str){
+	public void buildBytes(byte[] bytes){
+		final int length = iData.length + bytes.length;
+		byte[] z = new byte[ length ];
+		clearBytes(z);
+		for(int i = 0; i < iData.length; i++) z[i] = iData[i];
+		for(int i = iData.length; i < length; i++) z[i] = bData[i];
+		byte[] buff = new byte[z.length + 4];
+		clearBytes(buff);
+		for(int i = 0; i < z.length; i++) buff[i] = z[i];
+		for(int i = z.length; i < z.length + 4; i++){
+			buff[i] = (byte)0x00;
+			buff[++i] = (byte)0xFF;
+		}
+		allData = z;
+	}
+
+	public void createDataBytes(String str){
 		try {
-			byte[] buffStr = str2byteArray(str);
-			byte[] buff = new byte[buffStr.length + 4];
-			clearBytes(buff);
-			for(int i = 0; i < buffStr.length; i++) buff[i] = buffStr[i];
-			for(int i = buffStr.length; i < buffStr.length + 4; i++){
-				buff[i] = (byte)0x00;
-				buff[++i] = (byte)0xFF;
-			}
-			return buff;
+			byte[] buff = str2bytes(str);
+			bData = buff;
 		} catch (Exception e) {
 			System.out.println(e);
-			return null;
 		}
 	}
 
-	public byte[] createInfoBytes(String connection_no, String nextConnection, ctrl c, type t){
+	public void setDataBytes(byte[] bData){
+		this.bData = bData;
+	}
+
+	public byte[] getDataBytes(){
+		return bData;
+	}
+
+	public void createInfoBytes(String connection_no, String nextConnection, ctrl c, type t){
 		byte[] buff = new byte[iData.length];
 		clearBytes(buff);
 		try{
@@ -114,28 +137,59 @@ public abstract class JSocket extends Thread{
 			buff[2] = (byte)tempInt;
 
 			switch(c){
-				case DELETE: tempInt = 0x01;
-				case WRITE: tempInt = 0x02;
-				case READ: tempInt = 0x04;
-				default: tempInt = 0x00;
+				case DELETE: tempInt = 0x01; break;
+				case WRITE: tempInt = 0x02; break;
+				case READ: tempInt = 0x04; break;
+				default: tempInt = 0x00; break;
 			}
 
 			tempInt = tempInt << 4;
 
 			switch(t){
-				case USER: tempInt += 0x01;
-				case DATA: tempInt += 0x02;
-				case OPTION: tempInt += 0x04;
-				default: tempInt += 0x00;
+				case USER: tempInt += 0x01; break;
+				case DATA: tempInt += 0x02; break;
+				case OPTION: tempInt += 0x04; break;
+				default: tempInt += 0x00; break;
 			}
 
 			buff[3] = (byte)tempInt;
 
-			return buff;
+			iData = buff;
 		}catch (Exception e){
 			System.out.println(e);
-			return null;
 		}
+	}
+
+	public List<String> getInfo(byte[] bytes){
+		if(bytes.length < 4) return null;
+		List<String> str = new ArrayList<String>();
+		byte buff;
+		buff = bytes[1];
+		int xNum = (buff & 0xFF);
+		xNum = xNum << 8;
+		xNum += (bytes[0] & 0xFF);
+		str.add("" + xNum);
+
+		xNum = (bytes[2] & 0xFF);
+		str.add("" + xNum);
+
+		xNum = (bytes[3] >>> 4);
+		switch (xNum){
+			case 0x01: str.add("" + ctrl.DELETE); break;
+			case 0x02: str.add("" + ctrl.WRITE); break;
+			case 0x04: str.add("" + ctrl.READ); break;
+			default: str.add("" + ctrl.NULL); break;
+		}
+
+		xNum = (bytes[3] & 0x0F);
+		switch(xNum){
+			case 0x01: str.add("" + type.USER); break;
+			case 0x02: str.add("" + type.DATA); break;
+			case 0x04: str.add("" + type.OPTION); break;
+			default: str.add("" + type.NULL); break;
+		}
+
+		return str;
 	}
 
 	public String randomNO(int digits){
@@ -151,15 +205,7 @@ public abstract class JSocket extends Thread{
 		return allData;
 	}
 
-	public void setBufferBytes(byte[] bufferData){
-		this.bufferData = bufferData;
-	}
-
-	public byte[] getBufferBytes(){
-		return bufferData;
-	}
-
-	public byte[] str2byteArray(String str){
+	public byte[] str2bytes(String str){
 		try {
 			return str.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
@@ -168,13 +214,25 @@ public abstract class JSocket extends Thread{
 		}
 	}
 
-	public String byteArray2str(byte[] bytes){
+	public String bytes2str(byte[] bytes){
 		try {
 			return new String(bytes, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			System.out.println(e);
 			return null;
 		}
+	}
+
+	public int nextConnect(int cKEY, int cNO){
+		String sKEY = "" + cKEY;
+		String sNO = "" + cNO;
+		String buff = "";
+		for(int i = 0; i < sKEY.length(); i++){
+			int iStr = Integer.parseInt(sKEY.substring(i, i + 1));
+			int iXtr = Integer.parseInt(sNO.substring(i, i + 1));
+			buff += ((iStr == iXtr)? (iStr + 1) - iXtr : ((iStr > iXtr)? iStr - iXtr : iXtr - iStr));
+		}
+		return Integer.parseInt(buff);
 	}
 
 

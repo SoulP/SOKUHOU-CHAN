@@ -2,12 +2,18 @@ package sokuhou.JSocket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import sokuhou.cipher.JCipher.cipher;
+import sokuhou.cipher.JDecrypt;
+import sokuhou.cipher.JEncrypt;
+
 public class AccountRegister extends JSocket{
 	private String user_name, password, email, birth_day;
-	private String connection_no, nextConnect;
+	private int nextConnect;
+	private boolean check;
 
 	public AccountRegister(){
 		super();
@@ -15,6 +21,7 @@ public class AccountRegister extends JSocket{
 		password = null;
 		email = null;
 		birth_day = null;
+		check = false;
 	}
 
 	public void setUserName(String user_name){
@@ -49,6 +56,10 @@ public class AccountRegister extends JSocket{
 		return birth_day;
 	}
 
+	public boolean check(){
+		return check;
+	}
+
 	public void run(){
 		try{
 			if(getUserName() == null) throw new Exception("ERROR: user_name value is null");
@@ -56,21 +67,75 @@ public class AccountRegister extends JSocket{
 			if(getPassword() == null) throw new Exception ("ERROR: password value is null");
 			if(getBirthDay() == null) throw new Exception ("ERROR: birth_day value is null");
 
+			byte[] rData = null;
+			nextConnect = 0;
 			createSocket();
 			dos = new DataOutputStream(getSocket().getOutputStream());
 			dis = new DataInputStream(getSocket().getInputStream());
 
-			createInfoBytes("0000", "0", ctrl.WRITE, type.USER);
-			sData = "$REGISTER";
-			createDataBytes(sData);
+			JEncrypt enc = new JEncrypt();
+			enc.generateRSA_KEY();
+			JDecrypt dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());
+			byte[] publicKEY = enc.publicKey2bytes(enc.getPublicKey());
+
+			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);
+			createDataBytes("$REGISTER:USER;");
 			buildBytes();
 			dos.write(getAllBytes());
 
-			dis.read(getBufferBytes());
+			if(!dis.readBoolean()) return;
 
-			//←取得した接続番号を使って計算する
+			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);
+			buildBytes(publicKEY);
 
-			createInfoBytes(connection_no, nextConnect, ctrl.WRITE, type.USER);
+			dos.write(getAllBytes());
+
+			rData = new byte[dis.read(bufferData)];
+			clearBytes(rData);
+			List<String> info = getInfo(rData);
+			if(!info.get(0).equals("0000") || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+			for(int i = 0; i < rData.length; i++) rData[i] = bufferData[i];
+			clearBytes(bufferData);
+			if((rData[rData.length-4] | rData[rData.length-2]) != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+			if((rData[rData.length-3] | rData[rData.length-1]) != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+
+			byte[] buffData = new byte[rData.length-8];
+			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 4];
+
+			dec.setBytes(buffData);
+			dec.start();
+			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);
+			createDataBytes("$BOOL:OK;");
+			buildBytes();
+			dos.write(getAllBytes());
+
+			rData = new byte[dis.read(bufferData)];
+			clearBytes(rData);
+			for(int i = 0; i < rData.length; i++) rData[i] = bufferData[i];
+			info = getInfo(rData);
+			if(!info.get(0).equals("0000") || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+			for(int i = 0; i < rData.length; i++) rData[i] = bufferData[i];
+			clearBytes(bufferData);
+			if((rData[rData.length-4] | rData[rData.length-2]) != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+			if((rData[rData.length-3] | rData[rData.length-1]) != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+
+			buffData = new byte[rData.length-8];
+			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 4];
+
+			dec.join();
+			key = dec.bytes2secretKey(dec.getBytes());
+			dec.setBytes(buffData);
+			dec.start();
+			dec.join();
+			String connectKEY = bytes2str(dec.getBytes());
+			int cNO = Integer.parseInt(connectKEY.substring(0,4));
+			int cKEY = Integer.parseInt(connectKEY.substring(5, 8));
+
+
+			enc = new JEncrypt(cipher.AES, key);
+			dec = new JDecrypt(cipher.AES, key);
+
+			createInfoBytes("" + nextConnect(cKEY, cNO), "" + nextConnect++, ctrl.WRITE, type.USER);
 
 			Pattern pattern = Pattern.compile("[\\s\\¥p{Punct}]");
 			Matcher matcher = pattern.matcher(getUserName());
@@ -104,20 +169,25 @@ public class AccountRegister extends JSocket{
 
 			sData += getBirthDay() + ";";
 
-			//←取得した鍵を使って、sDataを暗号化する
-
 			createDataBytes(sData);
 			sData = null;
+
+			enc.setBytes(getDataBytes());
+			enc.start();
+			enc.join();
+
 			buildBytes();
 
 			dos.write(getAllBytes());
 
+			check = dis.readBoolean();
 
 			dis.close();
 			dos.close();
 			setSocket(null);
 		} catch (Exception e){
 			System.out.println(e);
+			e.getStackTrace();
 			setSocket(null);
 			try {
 				dos.close();

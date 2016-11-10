@@ -110,15 +110,15 @@ public class AccountRegister extends JSocket{
 
 			// 接続番号と接続番号用の乱数
 			String connectKEY = bytes2str(dec.getBytes());// 復号化したバイト列を文字列に変換し、connectKEYに保存する
-			int cNO = Integer.parseInt(connectKEY.substring(0,4));// 最初の4桁を接続番号としてcNOに保存する
-			int cKEY = Integer.parseInt(connectKEY.substring(5, 8));// 次の4桁を接続番号用の乱数としてcKEYに保存する
+			setConnectionNO(Integer.parseInt(connectKEY.substring(0,4)));// 最初の4桁を接続番号としてcNOに保存する
+			setConnectionKEY(Integer.parseInt(connectKEY.substring(5, 8)));// 次の4桁を接続番号用の乱数としてcKEYに保存する
 
 			// 暗号と復号の秘密鍵を設定する
 			enc = new JEncrypt(cipher.AES, key);// 暗号化
 			dec = new JDecrypt(cipher.AES, key);// 復号化
 
 			// ここからアカウント登録処理をする
-			createInfoBytes("" + nextConnect(cKEY, cNO), "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			createInfoBytes("" + nextConnect(), "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 
 			// 確認
 			Pattern pattern = Pattern.compile("[\\s\\¥p{Punct}]");// ユーザ名用のパターン
@@ -196,7 +196,7 @@ public class AccountRegister extends JSocket{
 			} catch (Exception e1) {
 				// 閉じる時にエラーが起きた際の処理
 				System.out.println(e1);// エラー内容を出力する
-				e1.getStackTrace();// 原因を追跡する
+				e1.printStackTrace();// 原因を追跡する
 				dis = null;// 受信用ストリームをnull値で消す
 				dos = null;// 送信用ストリームをnull値で消す
 			}

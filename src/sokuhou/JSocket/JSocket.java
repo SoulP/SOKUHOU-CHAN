@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public abstract class JSocket extends Thread{
 	String sData;
 	SecretKey key;
 	private String user_name, password, email, birth_day, otp;
+	private int cKEY, cNO;
 
 	public JSocket(){
 		port = 55324;
@@ -235,16 +237,15 @@ public abstract class JSocket extends Thread{
 		}
 	}
 
+	public int nextConnect(){
+		return nextConnect(cKEY, cNO);
+	}
+
 	public int nextConnect(int cKEY, int cNO){
-		String sKEY = "" + cKEY;
-		String sNO = "" + cNO;
-		String buff = "";
-		for(int i = 0; i < sKEY.length(); i++){
-			int iStr = Integer.parseInt(sKEY.substring(i, i + 1));
-			int iXtr = Integer.parseInt(sNO.substring(i, i + 1));
-			buff += ((iStr == iXtr)? (iStr + 1) - iXtr : ((iStr > iXtr)? iStr - iXtr : iXtr - iStr));
-		}
-		return Integer.parseInt(buff);
+		BigInteger bigINT = BigInteger.valueOf(cNO);
+		bigINT = bigINT.pow(cKEY);
+		bigINT = bigINT.mod(BigInteger.valueOf(10000));
+		return bigINT.intValue();
 	}
 
 	public void setUserName(String user_name){
@@ -285,6 +286,22 @@ public abstract class JSocket extends Thread{
 
 	public String getOTP(){
 		return otp;
+	}
+
+	public void setConnectionNO(int cNO){
+		this.cNO = cNO;
+	}
+
+	public int getConnectionNO(){
+		return cNO;
+	}
+
+	public void setConnectionKEY(int cKEY){
+		this.cKEY = cKEY;
+	}
+
+	public int getConnectionKEY(){
+		return cKEY;
 	}
 
 }

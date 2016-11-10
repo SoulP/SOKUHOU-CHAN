@@ -279,4 +279,12 @@ public abstract class JSocket extends Thread{
 		return birth_day;
 	}
 
+	public void setOTP(String otp){
+		this.otp = otp;
+	}
+
+	public String getOTP(){
+		return otp;
+	}
+
 }

@@ -81,7 +81,7 @@ public class AccountRegister extends JSocket{
 			dec.setBytes(buffData);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 
-			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			createInfoBytes(info.get(0), "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 			createDataBytes("$BOOL:OK;");// 文字列をバイト列に出力する
 			buildBytes();// 送信用バイト列に構築する
 			dos.write(getAllBytes());// 構築したバイト列を送信する

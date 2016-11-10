@@ -32,7 +32,7 @@ public abstract class JSocket extends Thread{
 		port = 55324;
 		host = "sokuhou.soulp.moe";
 		iData = new byte[ 4 ];
-		bData = new byte[ 1024 - iData.length ];
+		bData = null;
 		allData = new byte[ iData.length + bData.length ];
 		bufferData = new byte[Byte.MAX_VALUE - 1];
 		clearBytes(iData);

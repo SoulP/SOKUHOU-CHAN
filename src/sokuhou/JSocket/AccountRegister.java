@@ -11,18 +11,21 @@ import sokuhou.cipher.JDecrypt;
 import sokuhou.cipher.JEncrypt;
 
 public class AccountRegister extends JSocket{
-	private int nextConnect;
-	private boolean check;
+	private int nextConnect;// 接続順
+	private boolean check;// 登録処理確認
 
+	// コンストラクタ
 	public AccountRegister(){
 		super();
 		check = false;
 	}
 
+	// 登録処理確認 true = 登録完了, false = 登録失敗
 	public boolean check(){
 		return check;
 	}
 
+	// 登録処理
 	public void run(){
 		try{
 			// 値確認、問題あればエラーとして発生させる
@@ -176,7 +179,7 @@ public class AccountRegister extends JSocket{
 
 			dos.write(getAllBytes());// 構築したバイト列を送信する
 
-			check = dis.readBoolean();// boolean型の値を受信する true = 登録完了, false = サーバ側にトラブルで登録失敗
+			check = dis.readBoolean();// boolean型の値を受信する true = 登録完了, false = 登録失敗
 
 			// 接続を閉じる
 			dis.close();// 受信用ストリームを閉じる

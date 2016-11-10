@@ -26,6 +26,7 @@ public abstract class JSocket extends Thread{
 	byte[] bufferData;
 	String sData;
 	SecretKey key;
+	private String user_name, password, email, birth_day, otp;
 
 	public JSocket(){
 		port = 55324;
@@ -42,6 +43,10 @@ public abstract class JSocket extends Thread{
 		socket = null;
 		dos = null;
 		dis = null;
+		user_name = null;
+		password = null;
+		email = null;
+		birth_day = null;
 	}
 
 	public void createSocket(){
@@ -78,27 +83,34 @@ public abstract class JSocket extends Thread{
 
 	public void buildBytes(){
 		final int length = iData.length + bData.length;
-		byte[] z = new byte[ length ];
-		clearBytes(z);
-		for(int i = 0; i < iData.length; i++) z[i] = iData[i];
-		for(int i = iData.length; i < length; i++) z[i] = bData[i];
-		allData = z;
-	}
-
-	public void buildBytes(byte[] bytes){
-		final int length = iData.length + bytes.length;
-		byte[] z = new byte[ length ];
+		byte[] z = new byte[length];
 		clearBytes(z);
 		for(int i = 0; i < iData.length; i++) z[i] = iData[i];
 		for(int i = iData.length; i < length; i++) z[i] = bData[i];
 		byte[] buff = new byte[z.length + 4];
 		clearBytes(buff);
 		for(int i = 0; i < z.length; i++) buff[i] = z[i];
-		for(int i = z.length; i < z.length + 4; i++){
+		for(int i = z.length; i < buff.length; i++){
 			buff[i] = (byte)0x00;
 			buff[++i] = (byte)0xFF;
 		}
-		allData = z;
+		allData = buff;
+	}
+
+	public void buildBytes(byte[] bytes){
+		final int length = iData.length + bytes.length;
+		byte[] z = new byte[length];
+		clearBytes(z);
+		for(int i = 0; i < iData.length; i++) z[i] = iData[i];
+		for(int i = iData.length; i < length; i++) z[i] = bytes[i];
+		byte[] buff = new byte[z.length + 4];
+		clearBytes(buff);
+		for(int i = 0; i < z.length; i++) buff[i] = z[i];
+		for(int i = z.length; i < buff.length; i++){
+			buff[i] = (byte)0x00;
+			buff[++i] = (byte)0xFF;
+		}
+		allData = buff;
 	}
 
 	public void createDataBytes(String str){
@@ -235,5 +247,36 @@ public abstract class JSocket extends Thread{
 		return Integer.parseInt(buff);
 	}
 
+	public void setUserName(String user_name){
+		this.user_name = user_name;
+	}
+
+	protected String getUserName(){
+		return user_name;
+	}
+
+	public void setEmail(String email){
+		this.email = email;
+	}
+
+	protected String getEmail(){
+		return email;
+	}
+
+	public void setPassword(String password){
+		this.password = password;
+	}
+
+	protected String getPassword(){
+		return password;
+	}
+
+	public void setBirthDay(String birth_day){
+		this.birth_day = birth_day;
+	}
+
+	public String getBirthDay(){
+		return birth_day;
+	}
 
 }

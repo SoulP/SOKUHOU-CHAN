@@ -13,5 +13,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/httpmime-4.5.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jna-4.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jna-platform-4.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/local_policy.jar"/>
+	<classpathentry kind="lib" path="lib/US_export_policy.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

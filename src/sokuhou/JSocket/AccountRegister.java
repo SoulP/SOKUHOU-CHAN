@@ -1,7 +1,5 @@
 package sokuhou.JSocket;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +15,7 @@ public class AccountRegister extends JSocket{
 	// コンストラクタ
 	public AccountRegister(){
 		super();
+		nextConnect = 0;
 		check = false;
 	}
 
@@ -28,18 +27,18 @@ public class AccountRegister extends JSocket{
 	// 登録処理
 	public void run(){
 		try{
-			// 値確認、問題あればエラーとして発生させる
+			// 値がない場合は、エラーとして発生させる
 			if(getUserName() == null) throw new Exception("ERROR: user_name value is null");
 			if(getEmail() == null) throw new Exception("ERROR: email value is null");
 			if(getPassword() == null) throw new Exception ("ERROR: password value is null");
 			if(getBirthDay() == null) throw new Exception ("ERROR: birth_day value is null");
 
 			// 初期化
-			byte[] rData = null;// バイト列のデータ(主に受信)
+			rData = null;// バイト列のデータ(主に受信)
 			nextConnect = 0;// 接続順の番号
-			createSocket();// ソケット生成
-			dos = new DataOutputStream(getSocket().getOutputStream());// 送信用のストリーム生成
-			dis = new DataInputStream(getSocket().getInputStream());// 受信用のストリーム生成
+
+			// 接続を開く
+			open();
 
 			// 公開鍵と秘密鍵を生成する
 			JEncrypt enc = new JEncrypt();// 暗号化
@@ -49,20 +48,21 @@ public class AccountRegister extends JSocket{
 
 			// アカウントの登録を要求する
 			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			createDataBytes("$REGISTER:USER;");// 文字列をバイト列に出力する
+			setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
 			buildBytes();// 送信用バイト列に構築する
-			dos.write(getAllBytes());// 構築したバイト列を送信する
+			send(getAllBytes());// 構築したバイト列を送信する
 
 			// サーバが応じるかどうか確認する true = OK, false = NG
-			if(!dis.readBoolean()) return;// falseの場合、終了
+			if(!recvBoolean()) return;// falseの場合、終了
 
 			// クライアント(自分)の公開鍵を送信
 			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 			buildBytes(publicKEY);// 公開鍵のバイト列を使って、送信用バイト列に構築する
 
-			dos.write(getAllBytes());// 構築したバイト列を送信する
+			send(getAllBytes());// 構築したバイト列を送信する
 
-			rData = new byte[dis.read(bufferData)];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
+			int buffLength = recv(bufferData);
+			rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
 			clearBytes(rData);// バイト列を初期化する
 			for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
 			clearBytes(bufferData);// バイト列を初期化する
@@ -70,8 +70,10 @@ public class AccountRegister extends JSocket{
 			// 不正な接続番号もしくは、接続順の番号が正しくない場合は、エラーとして発生させる
 			if(!info.get(0).equals("0000") || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
 			// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
-			if((rData[rData.length-4] | rData[rData.length-2]) != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-			if((rData[rData.length-3] | rData[rData.length-1]) != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
 
 			// バイト列からデータを取る
 			byte[] buffData = new byte[rData.length-8];// データ用バイト列を作成する
@@ -81,21 +83,25 @@ public class AccountRegister extends JSocket{
 			dec.setBytes(buffData);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 
-			createInfoBytes(info.get(0), "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			createDataBytes("$BOOL:OK;");// 文字列をバイト列に出力する
+			String tempConnectNO = info.get(0);// 接続番号一時保持
+			createInfoBytes(tempConnectNO, "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			setDataBytes(str2bytes("$BOOL:OK;"));// 文字列をバイト列に出力する
 			buildBytes();// 送信用バイト列に構築する
-			dos.write(getAllBytes());// 構築したバイト列を送信する
+			send(getAllBytes());// 構築したバイト列を送信する
 
-			rData = new byte[dis.read(bufferData)];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
+			buffLength = recv(bufferData);
+			rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
 			clearBytes(rData);// バイト列を初期化する
 			for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
 			clearBytes(bufferData);// バイト列を初期化する
 			info = getInfo(rData);// 接続情報の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
 			// 不正な接続番号もしくは、接続順の番号が正しくない場合は、エラーとして発生させる
-			if(!info.get(0).equals("0000") || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+			if(!info.get(0).equals(tempConnectNO) || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
 			// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
-			if((rData[rData.length-4] | rData[rData.length-2]) != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-			if((rData[rData.length-3] | rData[rData.length-1]) != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+			if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
 
 			// バイト列からデータを取る
 			buffData = new byte[rData.length-8];// データ用バイト列を作成する
@@ -144,7 +150,6 @@ public class AccountRegister extends JSocket{
 			// パスワードを文字列に入れる
 			sData += "$PASSWORD:";
 			sData += getPassword() + ";";
-			setPassword(null);// パスワードをnull値で消す
 
 			// 確認
 			pattern = Pattern.compile(".+@.+\\..++?");// メールアドレス用のパターン
@@ -167,7 +172,7 @@ public class AccountRegister extends JSocket{
 			sData += getBirthDay() + ";";
 
 			// アカウント情報を送信する
-			createDataBytes(sData);// 文字列をバイト列に出力する
+			setDataBytes(str2bytes(sData));// 文字列をバイト列に出力する
 			sData = null;// 文字列をnull値で消す
 
 			// 暗号化
@@ -177,28 +182,36 @@ public class AccountRegister extends JSocket{
 
 			buildBytes();// 送信用バイト列に構築する
 
-			dos.write(getAllBytes());// 構築したバイト列を送信する
+			send(getAllBytes());// 構築したバイト列を送信する
 
-			check = dis.readBoolean();// boolean型の値を受信する true = 登録完了, false = 登録失敗
+			check = recvBoolean();// boolean型の値を受信する true = 登録完了, false = 登録失敗
 
 			// 接続を閉じる
-			dis.close();// 受信用ストリームを閉じる
-			dos.close();// 送信用ストリームを閉じる
-			setSocket(null);// ソケットをnull値で消す
+			close();
+
+			// 値を消す
+			setPassword(null);// パスワードをnull値で消す
+			nextConnect = 0;// 初期化する
+			enc = null; // 暗号化をnull値で消す
+			dec = null; // 復号化をnull値で消す
+			pattern = null; // パターンをnull値で消す
+			matcher = null; // 確認処理をnull値で消す
+
+
 		} catch (Exception e){
 		// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する
-			e.getStackTrace();// 原因を追跡する
-			setSocket(null);// ソケットをnull値で消す
+			e.printStackTrace();;// 原因の追跡を表示
 			try {
-				dis.close();// 受信用ストリームを閉じる
-				dos.close();// 送信用ストリームを閉じる
+				// 接続を閉じる
+				close();
 			} catch (Exception e1) {
 				// 閉じる時にエラーが起きた際の処理
-				System.out.println(e1);// エラー内容を出力する
+				System.out.println(e1);// エラー内容表示
 				e1.printStackTrace();// 原因を追跡する
-				dis = null;// 受信用ストリームをnull値で消す
-				dos = null;// 送信用ストリームをnull値で消す
+				setSocket(null);// ソケットをnull値で消す
+				setDIS(null);// 受信用ストリームをnull値で消す
+				setDOS(null);// 送信用ストリームをnull値で消す
 			}
 		}
 	}

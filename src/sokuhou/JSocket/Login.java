@@ -1,5 +1,9 @@
 package sokuhou.JSocket;
 
+import sokuhou.cipher.JCipher.cipher;
+import sokuhou.cipher.JDecrypt;
+import sokuhou.cipher.JEncrypt;
+
 public class Login extends JSocket{
 	private int nextConnect;// 接続順
 	private boolean check;// 接続処理確認
@@ -7,6 +11,7 @@ public class Login extends JSocket{
 	// コンストラクタ
 	public Login(){
 		super();
+		nextConnect = 0;
 		check = false;
 	}
 
@@ -17,11 +22,33 @@ public class Login extends JSocket{
 
 	public void run(){
 		try{
-			// 値確認、問題あればエラーとして発生させる
+			// 値がない場合は、エラーとして発生させる
 			if(getEmail() == null) throw new Exception("ERROR: email value is null");
 			if(getPassword() == null) throw new Exception ("ERROR: password value is null");
 
+			// 初期化
+			byte[] rData = null;// バイト列のデータ(主に受信)
+			nextConnect = 0;// 接続順の番号
 
+			open(); // 接続を開く
+
+			// 公開鍵と秘密鍵を生成する
+			JEncrypt enc = new JEncrypt();// 暗号化
+			enc.generateRSA_KEY();// RSA用の公開鍵と秘密鍵を生成する
+			JDecrypt dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
+			byte[] publicKEY = enc.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
+
+			// アカウントの登録を要求する
+			createInfoBytes("9999", "" + nextConnect++, ctrl.READ, type.USER);// 接続情報をバイト列に出力する
+			setDataBytes(str2bytes("$LOGIN:USER;"));// 文字列をバイト列に出力する
+			buildBytes();// 送信用バイト列に構築する
+			send(getAllBytes());// 構築したバイト列を送信する
+
+			// サーバが応じるかどうか確認する true = OK, false = NG
+			if(!recvBoolean()) return;// falseの場合、終了
+
+			// 接続を閉じる
+			close();
 		} catch (Exception e){
 			System.out.println(e);
 			e.printStackTrace();

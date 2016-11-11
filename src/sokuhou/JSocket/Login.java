@@ -5,13 +5,11 @@ import sokuhou.cipher.JDecrypt;
 import sokuhou.cipher.JEncrypt;
 
 public class Login extends JSocket{
-	private int nextConnect;// 接続順
 	private boolean check;// 接続処理確認
 
 	// コンストラクタ
 	public Login(){
 		super();
-		nextConnect = 0;
 		check = false;
 	}
 
@@ -28,7 +26,6 @@ public class Login extends JSocket{
 
 			// 初期化
 			byte[] rData = null;// バイト列のデータ(主に受信)
-			nextConnect = 0;// 接続順の番号
 
 			open(); // 接続を開く
 
@@ -39,7 +36,7 @@ public class Login extends JSocket{
 			byte[] publicKEY = enc.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
 			// アカウントの登録を要求する
-			createInfoBytes("9999", "" + nextConnect++, ctrl.READ, type.USER);// 接続情報をバイト列に出力する
+			createInfoBytes("9999", ctrl.READ, type.USER);// 接続情報をバイト列に出力する
 			setDataBytes(str2bytes("$LOGIN:USER;"));// 文字列をバイト列に出力する
 			buildBytes();// 送信用バイト列に構築する
 			send(getAllBytes());// 構築したバイト列を送信する
@@ -47,11 +44,33 @@ public class Login extends JSocket{
 			// サーバが応じるかどうか確認する true = OK, false = NG
 			if(!recvBoolean()) return;// falseの場合、終了
 
+			setConnectionNO(randomNO(4));
+
+			// クライアント(自分)の公開鍵を送信
+			createInfoBytes("" + getConnectionNO(), ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			buildBytes(publicKEY);// 公開鍵のバイト列を使って、送信用バイト列に構築する
+
+			send(getAllBytes());// 構築したバイト列を送信する
+
+
+
 			// 接続を閉じる
 			close();
 		} catch (Exception e){
-			System.out.println(e);
-			e.printStackTrace();
+		// エラーが起きた際の処理
+			System.out.println(e);// エラー内容を出力する
+			e.printStackTrace();;// 原因の追跡を表示
+			try {
+				// 接続を閉じる
+				close();
+			} catch (Exception e1) {
+				// 閉じる時にエラーが起きた際の処理
+				System.out.println(e1);// エラー内容表示
+				e1.printStackTrace();// 原因を追跡する
+				setSocket(null);// ソケットをnull値で消す
+				setDIS(null);// 受信用ストリームをnull値で消す
+				setDOS(null);// 送信用ストリームをnull値で消す
+			}
 		}
 	}
 }

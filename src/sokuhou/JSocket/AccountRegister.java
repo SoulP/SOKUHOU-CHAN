@@ -9,13 +9,11 @@ import sokuhou.cipher.JDecrypt;
 import sokuhou.cipher.JEncrypt;
 
 public class AccountRegister extends JSocket{
-	private int nextConnect;// 接続順
 	private boolean check;// 登録処理確認
 
 	// コンストラクタ
 	public AccountRegister(){
 		super();
-		nextConnect = 0;
 		check = false;
 	}
 
@@ -27,6 +25,7 @@ public class AccountRegister extends JSocket{
 	// 登録処理
 	public void run(){
 		try{
+// 01. CLが接続の準備をする(初期化など)
 			// 値がない場合は、エラーとして発生させる
 			if(getUserName() == null) throw new Exception("ERROR: user_name value is null");
 			if(getEmail() == null) throw new Exception("ERROR: email value is null");
@@ -35,40 +34,50 @@ public class AccountRegister extends JSocket{
 
 			// 初期化
 			rData = null;// バイト列のデータ(主に受信)
-			nextConnect = 0;// 接続順の番号
 
 			// 接続を開く
 			open();
 
+// 02. CLが公開鍵と秘密鍵を生成する
 			// 公開鍵と秘密鍵を生成する
 			JEncrypt enc = new JEncrypt();// 暗号化
 			enc.generateRSA_KEY();// RSA用の公開鍵と秘密鍵を生成する
 			JDecrypt dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
 			byte[] publicKEY = enc.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
+// 03. CLがSVに接続を要求する(接続情報の接続番号は0000)
 			// アカウントの登録を要求する
-			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 			setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
 			buildBytes();// 送信用バイト列に構築する
 			send(getAllBytes());// 構築したバイト列を送信する
 
+// 05. CLが応じられた結果を確認する
+// 06. TRUEの場合は、CLの公開鍵をSVに送る(接続情報の接続番号は0000)
+// -06. FALSEの場合は、CLは閉じる
 			// サーバが応じるかどうか確認する true = OK, false = NG
-			if(!recvBoolean()) return;// falseの場合、終了
+			if(!recvBoolean()){// falseの場合、終了
+				if(!getSocket().isClosed()) close();// 接続が閉じられていない場合は、閉じる
+				return;
+			}
 
 			// クライアント(自分)の公開鍵を送信
-			createInfoBytes("0000", "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 			buildBytes(publicKEY);// 公開鍵のバイト列を使って、送信用バイト列に構築する
 
+			// 送信
 			send(getAllBytes());// 構築したバイト列を送信する
 
+// 09. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
+			// 受信
 			int buffLength = recv(bufferData);
 			rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
 			clearBytes(rData);// バイト列を初期化する
 			for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
 			clearBytes(bufferData);// バイト列を初期化する
 			List<String> info = getInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
-			// 不正な接続番号もしくは、接続順の番号が正しくない場合は、エラーとして発生させる
-			if(!info.get(0).equals("0000") || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+			// 不正な接続番号の場合は、エラーとして発生させる
+			if(!info.get(0).equals("0000")) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
 			// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
 			if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
 			if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
@@ -76,27 +85,27 @@ public class AccountRegister extends JSocket{
 			if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
 
 			// バイト列からデータを取る
-			byte[] buffData = new byte[rData.length-8];// データ用バイト列を作成する
-			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 4];// 接続情報と終了コードを含めずに、データだけコピーする
+			byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
+			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 接続情報と終了コードを含めずに、データだけコピーする
 
 			// 復号化
 			dec.setBytes(buffData);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 
-			String tempConnectNO = info.get(0);// 接続番号一時保持
-			createInfoBytes(tempConnectNO, "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			setDataBytes(str2bytes("$BOOL:OK;"));// 文字列をバイト列に出力する
-			buildBytes();// 送信用バイト列に構築する
-			send(getAllBytes());// 構築したバイト列を送信する
+// 10. CLがSVにTRUEで応じる
+			// 送信
+			sendBoolean(true);
 
+// 14. CLがSVから暗号化されたデータ情報を受け取り、CLの秘密鍵で復号化する
+			// 受信
 			buffLength = recv(bufferData);
 			rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
 			clearBytes(rData);// バイト列を初期化する
 			for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
 			clearBytes(bufferData);// バイト列を初期化する
 			info = getInfo(rData);// 接続情報の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
-			// 不正な接続番号もしくは、接続順の番号が正しくない場合は、エラーとして発生させる
-			if(!info.get(0).equals(tempConnectNO) || !info.get(1).equals("" + nextConnect++)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+			// 不正な接続番号の場合は、エラーとして発生させる
+			if(!info.get(0).equals("0000")) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
 			// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
 			if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
 			if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
@@ -104,8 +113,8 @@ public class AccountRegister extends JSocket{
 			if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
 
 			// バイト列からデータを取る
-			buffData = new byte[rData.length-8];// データ用バイト列を作成する
-			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 4];// 情報と終了コードを含めずに、データだけコピーする
+			buffData = new byte[rData.length-7];// データ用バイト列を作成する
+			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 情報と終了コードを含めずに、データだけコピーする
 
 			dec.join();// 復号化処理終了待ち
 			key = dec.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
@@ -114,6 +123,7 @@ public class AccountRegister extends JSocket{
 			dec.start();// 復号化開始
 			dec.join();// 復号化処理終了待ち
 
+// 15. CLが復号化されたデータ情報を接続番号と接続番号用の鍵としてint型に変換する
 			// 接続番号と接続番号用の乱数
 			String connectKEY = bytes2str(dec.getBytes());// 復号化したバイト列を文字列に変換し、connectKEYに保存する
 			setConnectionNO(Integer.parseInt(connectKEY.substring(0,4)));// 最初の4桁を接続番号としてcNOに保存する
@@ -123,8 +133,10 @@ public class AccountRegister extends JSocket{
 			enc = new JEncrypt(cipher.AES, key);// 暗号化
 			dec = new JDecrypt(cipher.AES, key);// 復号化
 
+// 16. CLが接続番号と接続番号用の鍵を使って、次の接続番号を生成する
+// 17. CLがユーザが入力した情報をデータ情報として作成し、共通鍵で暗号化する
 			// ここからアカウント登録処理をする
-			createInfoBytes("" + nextConnect(), "" + nextConnect++, ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			createInfoBytes("" + nextConnect(), ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 
 			// 確認
 			Pattern pattern = Pattern.compile("[\\s\\¥p{Punct}]");// ユーザ名用のパターン
@@ -182,8 +194,12 @@ public class AccountRegister extends JSocket{
 
 			buildBytes();// 送信用バイト列に構築する
 
+// 18. CLがSVにユーザ情報を送る(接続情報の接続番号は、16.の次の接続番号)
+			// 送信
 			send(getAllBytes());// 構築したバイト列を送信する
 
+// FIN. 結果待ち
+			// 受信
 			check = recvBoolean();// boolean型の値を受信する true = 登録完了, false = 登録失敗
 
 			// 接続を閉じる
@@ -191,12 +207,10 @@ public class AccountRegister extends JSocket{
 
 			// 値を消す
 			setPassword(null);// パスワードをnull値で消す
-			nextConnect = 0;// 初期化する
 			enc = null; // 暗号化をnull値で消す
 			dec = null; // 復号化をnull値で消す
 			pattern = null; // パターンをnull値で消す
 			matcher = null; // 確認処理をnull値で消す
-
 
 		} catch (Exception e){
 		// エラーが起きた際の処理

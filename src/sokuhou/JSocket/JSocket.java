@@ -36,10 +36,10 @@ public abstract class JSocket extends Thread{
 		// 初期化
 		port = 55324;// 接続先のポート番号
 		host = "sokuhou.soulp.moe";// 接続先のホスト名/ドメイン名/IPアドレス
-		iData = new byte[ 4 ];// 接続情報のバイト列
+		iData = new byte[ 3 ];// 接続情報のバイト列
 		bData = null;// データ情報のバイト列
 		rData = null;// 受信したデータのバイト列
-		allData = new byte[ iData.length + bData.length ];// 送信用のバイト列
+		allData = null;// 送信用のバイト列
 		bufferData = new byte[Byte.MAX_VALUE - 1];// 受信用のバイト列
 		clearBytes(iData);// バイト列のバイト値を全て0x00にする
 		clearBytes(bData);// バイト列のバイト値を全て0x00にする
@@ -257,7 +257,7 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 接続情報のバイト列生成 (接続番号 + 接続順 + 操作 + 種類)
-	public void createInfoBytes(String connection_no, String nextConnection, ctrl c, type t){
+	public void createInfoBytes(String connection_no, ctrl c, type t){
 		byte[] buff = new byte[iData.length];
 		clearBytes(buff);
 		try{
@@ -268,12 +268,6 @@ public abstract class JSocket extends Thread{
 
 			buff[0] = (byte)(tempInt & 0xFF);
 			buff[1] = (byte)(tempInt >>> 8);
-
-			tempInt = Integer.parseInt(nextConnection);
-			if(tempInt > 255) throw new Exception("ERROR: nextConnection maximum is 255. value: " + tempInt);
-			if(tempInt < 0) throw new Exception("ERROR: nextConnection minimum is 0. value: " + tempInt);
-
-			buff[2] = (byte)tempInt;
 
 			switch(c){
 				case DELETE: tempInt = 0x01; break;
@@ -291,7 +285,7 @@ public abstract class JSocket extends Thread{
 				default: tempInt += 0x00; break;
 			}
 
-			buff[3] = (byte)tempInt;
+			buff[2] = (byte)tempInt;
 
 			iData = buff;
 		}catch (Exception e){
@@ -310,10 +304,8 @@ public abstract class JSocket extends Thread{
 		xNum = xNum << 8;
 		xNum += (bytes[0] & 0xFF);
 		str.add("" + xNum);
-		xNum = (bytes[2] & 0xFF);
-		str.add("" + xNum);
 
-		xNum = (bytes[3] >>> 4);
+		xNum = (bytes[2] >>> 4);
 		switch (xNum){
 			case 0x01: str.add("" + ctrl.DELETE); break;
 			case 0x02: str.add("" + ctrl.WRITE); break;
@@ -321,7 +313,7 @@ public abstract class JSocket extends Thread{
 			default: str.add("" + ctrl.NULL); break;
 		}
 
-		xNum = (bytes[3] & 0x0F);
+		xNum = (bytes[2] & 0x0F);
 		switch(xNum){
 			case 0x01: str.add("" + type.USER); break;
 			case 0x02: str.add("" + type.DATA); break;
@@ -333,14 +325,15 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 乱数生成 一番上の数字が0が出ない出力
-	public String randomNO(int digits){
+	public int randomNO(int digits){
 		String buffer = "";// 初期化
 		for(int i = 0; i < digits; i++)buffer += (int)(Math.random() * 10.0);// 桁数で各桁に乱数(0～9)を入れる
 		int x = Integer.parseInt(buffer);// 文字列をint型に変換
 		buffer = "" + x;// int型を文字列に変換
-		if(buffer.length() != digits) buffer = randomNO(digits);// 同じ桁数ではない場合は、乱数を生成する
-		buffer = x == 0 ? randomNO(digits) : x == 9999 ? randomNO(digits) : buffer;// 数字が0もしくは9999の場合は、乱数を生成する
-		return buffer;
+		if(buffer.length() != digits) x = randomNO(digits);// 同じ桁数ではない場合は、乱数を生成する
+		x = x == 0 ? randomNO(digits) : x == 9999 ? randomNO(digits) : x;// 数字が0もしくは9999の場合は、乱数を生成する
+		x = Integer.parseInt(buffer);
+		return x;
 	}
 
 	// 構築したバイト列 出力

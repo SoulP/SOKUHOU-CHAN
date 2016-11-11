@@ -30,6 +30,7 @@ public abstract class JSocket extends Thread{
 	protected SecretKey key;// 共通鍵
 	private String user_name, password, email, birth_day, otp;// ユーザ情報の文字列
 	private int cKEY, cNO;// 接続情報の接続番号用の鍵と接続番号
+	private List<String> info;// 接続情報のリスト
 
 	// コンストラクタ
 	public JSocket(){
@@ -56,6 +57,7 @@ public abstract class JSocket extends Thread{
 		otp = null;// ワンタイムパスワードの文字列
 		cKEY = 0;// 接続情報の接続番号用の鍵
 		cNO = 0;// 接続情報の接続番号
+		info = null;// 接続情報のリスト
 	}
 
 // 通信
@@ -155,6 +157,28 @@ public abstract class JSocket extends Thread{
 	// 受信 バイト列
 	protected int recv(byte[] bytes) throws IOException{
 		return dis.read(bytes);
+	}
+
+	// 受信 バイト列
+	protected byte[] recv(String connectionNO) throws Exception{
+		int buffLength = recv(bufferData);
+		rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
+		clearBytes(rData);// バイト列を初期化する
+		for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
+		clearBytes(bufferData);// バイト列を初期化する
+		info = getInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
+		// 不正な接続番号の場合は、エラーとして発生させる
+		if(!info.get(0).equals(connectionNO)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+		// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
+		if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+
+		// バイト列からデータを取る
+		byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
+		for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 接続情報と終了コードを含めずに、データだけコピーする
+		return buffData;
 	}
 
 	// 受信 byte型
@@ -368,12 +392,12 @@ public abstract class JSocket extends Thread{
 // 接続情報
 
 	// 次の接続番号 出力
-	public int nextConnect(){
+	protected int nextConnect(){
 		return nextConnect(cKEY, cNO);
 	}
 
 	// 次の接続番号 出力
-	public int nextConnect(int cKEY, int cNO){
+	protected int nextConnect(int cKEY, int cNO){
 		// (cNO ^ cKEY) % 10000
 		// (cNO pow cKEY) mod 10000
 		BigInteger bigINT = BigInteger.valueOf(cNO);
@@ -383,23 +407,33 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 接続番号 入力
-	public void setConnectionNO(int cNO){
+	protected void setConnectionNO(int cNO){
 		this.cNO = cNO;
 	}
 
 	// 接続番号 出力
-	public int getConnectionNO(){
+	protected int getConnectionNO(){
 		return cNO;
 	}
 
 	// 接続番号用の鍵 入力
-	public void setConnectionKEY(int cKEY){
+	protected void setConnectionKEY(int cKEY){
 		this.cKEY = cKEY;
 	}
 
 	// 接続番号用の鍵 出力
-	public int getConnectionKEY(){
+	protected int getConnectionKEY(){
 		return cKEY;
+	}
+
+	// 接続情報のリスト 入力
+	protected void setInfoList(List<String> info){
+		this.info = info;
+	}
+
+	// 接続情報のリスト 出力
+	protected List<String> getInfoList(){
+		return info;
 	}
 
 // ユーザ情報

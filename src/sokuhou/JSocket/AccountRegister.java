@@ -1,6 +1,5 @@
 package sokuhou.JSocket;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,26 +69,10 @@ public class AccountRegister extends JSocket{
 
 // 09. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
 			// 受信
-			int buffLength = recv(bufferData);
-			rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
-			clearBytes(rData);// バイト列を初期化する
-			for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
-			clearBytes(bufferData);// バイト列を初期化する
-			List<String> info = getInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
-			// 不正な接続番号の場合は、エラーとして発生させる
-			if(!info.get(0).equals("0000")) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
-			// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
-			if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-			if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-			if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-			if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-
-			// バイト列からデータを取る
-			byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
-			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 接続情報と終了コードを含めずに、データだけコピーする
+			byte[] buff = recv("0000");
 
 			// 復号化
-			dec.setBytes(buffData);// データのバイト列を復号化に入力する
+			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 
 // 10. CLがSVにTRUEで応じる
@@ -98,28 +81,12 @@ public class AccountRegister extends JSocket{
 
 // 14. CLがSVから暗号化されたデータ情報を受け取り、CLの秘密鍵で復号化する
 			// 受信
-			buffLength = recv(bufferData);
-			rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
-			clearBytes(rData);// バイト列を初期化する
-			for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
-			clearBytes(bufferData);// バイト列を初期化する
-			info = getInfo(rData);// 接続情報の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
-			// 不正な接続番号の場合は、エラーとして発生させる
-			if(!info.get(0).equals("0000")) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
-			// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
-			if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-			if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-			if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-			if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-
-			// バイト列からデータを取る
-			buffData = new byte[rData.length-7];// データ用バイト列を作成する
-			for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 情報と終了コードを含めずに、データだけコピーする
+			buff = recv("0000");
 
 			dec.join();// 復号化処理終了待ち
 			key = dec.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
 			// 復号化
-			dec.setBytes(buffData);// データのバイト列を復号化に入力する
+			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 			dec.join();// 復号化処理終了待ち
 

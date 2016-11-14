@@ -31,6 +31,7 @@ public abstract class JSocket extends Thread{
 	private String user_name, password, email, birth_day, otp;// ユーザ情報の文字列
 	private int cKEY, cNO;// 接続情報の接続番号用の鍵と接続番号
 	private List<String> info;// 接続情報のリスト
+	protected boolean check;// 確認
 
 	// コンストラクタ
 	public JSocket(){
@@ -56,6 +57,7 @@ public abstract class JSocket extends Thread{
 		cKEY = 0;// 接続情報の接続番号用の鍵
 		cNO = 0;// 接続情報の接続番号
 		info = null;// 接続情報のリスト
+		check = false;
 	}
 
 // 通信
@@ -452,6 +454,11 @@ public abstract class JSocket extends Thread{
 		return info;
 	}
 
+	// 接続情報のリスト クリア
+	protected void clearInfoList(){
+		info = null;
+	}
+
 // ユーザ情報
 
 	// ユーザ名 入力
@@ -512,5 +519,10 @@ public abstract class JSocket extends Thread{
 		setEmail(null);// null値で初期化
 		setBirthDay(null);// null値で初期化
 		setOTP(null);// null値で初期化
+	}
+
+	// 登録処理確認 true = 完了, false = 失敗
+	public boolean check(){
+		return check;
 	}
 }

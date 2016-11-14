@@ -9,17 +9,10 @@ import sokuhou.JCipher.JDecrypt;
 import sokuhou.JCipher.JEncrypt;
 
 public class Login extends JSocket{
-	private boolean check;// 接続処理確認
 
 	// コンストラクタ
 	public Login(){
 		super();
-		check = false;
-	}
-
-	// 接続処理確認 true = 接続完了, false = 接続失敗
-	public boolean check(){
-		return check;
 	}
 
 	// CHAP認証
@@ -29,6 +22,7 @@ public class Login extends JSocket{
 		return JCipher.toHashCode(JCipher.hash.SHA512, bigInt.toString());
 	}
 
+	// 実行
 	public void run(){
 		// 初期化
 		JEncrypt enc = null;// null値で初期化
@@ -130,6 +124,12 @@ public class Login extends JSocket{
 			sData += chapHash;
 			sData += ";";
 
+			if(getOTP() != null){
+				sData += "$OTP:";
+				sData += getOTP();
+				sData += ";";
+			}
+
 			// 暗号化
 			setDataBytes(str2bytes(sData));
 			enc.setBytes(getDataBytes());
@@ -144,7 +144,7 @@ public class Login extends JSocket{
 
 // FIN. 結果待ち
 			// 受信
-			check = recvBoolean();
+			check = recvBoolean();// boolean型の値を受信する true = ログイン完了, false = ログイン失敗
 
 			// 接続を閉じる
 			close();
@@ -167,6 +167,7 @@ public class Login extends JSocket{
 		}finally{
 			// 初期化
 			clearUser();// null値で初期化
+			clearInfoList();// null値で初期化
 			sData = null;// null値で初期化
 			enc = null;// null値で初期化
 			dec = null;// null値で初期化

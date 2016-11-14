@@ -9,17 +9,10 @@ import sokuhou.JCipher.JDecrypt;
 import sokuhou.JCipher.JEncrypt;
 
 public class AccountRegister extends JSocket{
-	private boolean check;// 登録処理確認
 
 	// コンストラクタ
 	public AccountRegister(){
 		super();
-		check = false;
-	}
-
-	// 登録処理確認 true = 登録完了, false = 登録失敗
-	public boolean check(){
-		return check;
 	}
 
 	// 登録処理
@@ -195,6 +188,10 @@ public class AccountRegister extends JSocket{
 		}finally{
 			// 初期化
 			clearUser();// ユーザ情報の全てnull値で初期化
+			setSecretKey(null);// null値で初期化
+			setConnectionNO(0);// 0で初期化
+			setConnectionKEY(0);// 0で初期化
+			clearInfoList();// null値で初期化
 			sData = null;// null値で初期化
 			enc = null;// null値で初期化
 			dec = null;// null値で初期化

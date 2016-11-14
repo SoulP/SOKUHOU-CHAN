@@ -1,4 +1,4 @@
-package server;
+package server.JSocket;
 
 import java.net.Socket;
 

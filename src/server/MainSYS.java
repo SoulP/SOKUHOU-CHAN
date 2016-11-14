@@ -3,6 +3,8 @@ package server;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import server.JSocket.Service;
+
 public class MainSYS {
 
 	public static void main(String[] args) {

@@ -146,25 +146,25 @@ public class Login extends JSocket{
 			// 受信
 			check = recvBoolean();
 
-			if(!getSocket().isClosed()) close();// 接続を閉じる
-
 		} catch (Exception e){
 		// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する
 			e.printStackTrace();// 原因の追跡を表示
 			check = false;
+		}finally{
 			try {
 				// 接続を閉じる
-				if(!getSocket().isClosed()) close();
-			} catch (Exception e1) {
+				if(!getSocket().isClosed())close();
+			} catch (Exception e) {
+				System.out.println(e);
+				e.printStackTrace();
 				// 閉じる時にエラーが起きた際の処理
-				System.out.println(e1);// エラー内容表示
-				e1.printStackTrace();// 原因を追跡する
+				System.out.println(e);// エラー内容表示
+				e.printStackTrace();// 原因を追跡する
 				setSocket(null);// ソケットをnull値で消す
 				setDIS(null);// 受信用ストリームをnull値で消す
 				setDOS(null);// 送信用ストリームをnull値で消す
 			}
-		}finally{
 			// 初期化
 			clearUser();// null値で初期化
 			clearInfoList();// null値で初期化

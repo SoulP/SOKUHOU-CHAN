@@ -1,4 +1,4 @@
-package sokuhou;
+package sokuhou.Window;
 
 import javax.swing.JFrame;
 

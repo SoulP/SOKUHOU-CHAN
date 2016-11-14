@@ -1,4 +1,4 @@
-package sokuhou;
+package sokuhou.NETWORK;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

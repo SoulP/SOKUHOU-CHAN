@@ -1,4 +1,4 @@
-package sokuhou;
+package sokuhou.Window;
 
 import java.awt.Color;
 import java.awt.Graphics;

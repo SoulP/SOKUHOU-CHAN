@@ -1,5 +1,10 @@
 package sokuhou;
 
+import sokuhou.DataBase.DBA;
+import sokuhou.InputOutput.IOsys;
+import sokuhou.NETWORK.NetGET;
+import sokuhou.NETWORK.NetWork;
+
 public class MainSYS {
 
 	public static void main(String[] args) {

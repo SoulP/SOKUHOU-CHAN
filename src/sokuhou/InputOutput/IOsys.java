@@ -1,9 +1,12 @@
-package sokuhou;
+package sokuhou.InputOutput;
 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
+
+import sokuhou.Window.Window;
+import sokuhou.Window.Window_POP;
 
 //Input / Output (入出力)
 public class IOsys extends IO{

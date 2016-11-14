@@ -181,5 +181,11 @@ public class MainSYS {
 			e.printStackTrace();
 		}
 		*/
+		/*
+		BigInteger big = BigInteger.valueOf(1234567890);
+		String hash = JCipher.toHashCode(JCipher.hash.SHA1, big.toString());
+		System.out.println();
+		System.out.println(hash);
+		*/
 	}
 }

@@ -406,6 +406,12 @@ public abstract class JSocket extends Thread{
 		return bigINT.intValue();
 	}
 
+	// 次の接続番号 設定
+	protected void setNextConnection(String connectKEY){
+		setConnectionNO(Integer.parseInt(connectKEY.substring(0,4)));// 最初の4桁を接続番号としてcNOに保存する
+		setConnectionKEY(Integer.parseInt(connectKEY.substring(5, 8)));// 次の4桁を接続番号用の乱数としてcKEYに保存する
+	}
+
 	// 接続番号 入力
 	protected void setConnectionNO(int cNO){
 		this.cNO = cNO;

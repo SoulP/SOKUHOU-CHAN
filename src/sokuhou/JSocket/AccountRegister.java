@@ -67,7 +67,7 @@ public class AccountRegister extends JSocket{
 			// 送信
 			send(getAllBytes());// 構築したバイト列を送信する
 
-// 09. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
+// 10. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
 			// 受信
 			byte[] buff = recv("0000");
 
@@ -75,33 +75,32 @@ public class AccountRegister extends JSocket{
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 
-// 10. CLがSVにTRUEで応じる
+// 11. CLがSVにTRUEで応じる
 			// 送信
 			sendBoolean(true);
 
-// 14. CLがSVから暗号化されたデータ情報を受け取り、CLの秘密鍵で復号化する
+// 15. CLがSVから暗号化されたデータ情報を受け取り、CLの秘密鍵で復号化する
 			// 受信
 			buff = recv("0000");
 
+			// 復号化
 			dec.join();// 復号化処理終了待ち
 			key = dec.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
-			// 復号化
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 			dec.join();// 復号化処理終了待ち
 
-// 15. CLが復号化されたデータ情報を接続番号と接続番号用の鍵としてint型に変換する
+// 16. CLが復号化されたデータ情報を接続番号と接続番号用の鍵としてint型に変換する
 			// 接続番号と接続番号用の乱数
 			String connectKEY = bytes2str(dec.getBytes());// 復号化したバイト列を文字列に変換し、connectKEYに保存する
-			setConnectionNO(Integer.parseInt(connectKEY.substring(0,4)));// 最初の4桁を接続番号としてcNOに保存する
-			setConnectionKEY(Integer.parseInt(connectKEY.substring(5, 8)));// 次の4桁を接続番号用の乱数としてcKEYに保存する
+			setNextConnection(connectKEY);// 次の接続番号の設定
 
 			// 暗号と復号の秘密鍵を設定する
 			enc = new JEncrypt(cipher.AES, key);// 暗号化
 			dec = new JDecrypt(cipher.AES, key);// 復号化
 
-// 16. CLが接続番号と接続番号用の鍵を使って、次の接続番号を生成する
-// 17. CLがユーザが入力した情報をデータ情報として作成し、共通鍵で暗号化する
+// 17. CLが接続番号と接続番号用の鍵を使って、次の接続番号を生成する
+// 18. CLがユーザが入力した情報をデータ情報として作成し、共通鍵で暗号化する
 			// ここからアカウント登録処理をする
 			createInfoBytes("" + nextConnect(), ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 
@@ -161,7 +160,7 @@ public class AccountRegister extends JSocket{
 
 			buildBytes();// 送信用バイト列に構築する
 
-// 18. CLがSVにユーザ情報を送る(接続情報の接続番号は、16.の次の接続番号)
+// 19. CLがSVにユーザ情報を送る(接続情報の接続番号は、16.の次の接続番号)
 			// 送信
 			send(getAllBytes());// 構築したバイト列を送信する
 

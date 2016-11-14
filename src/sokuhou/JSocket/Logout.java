@@ -39,7 +39,7 @@ public class Logout extends JSocket{
 			setConnectionNO(nextConnect());
 			createInfoBytes("" + nextConnect(), ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 
-			enc.join();
+			enc.join();// 暗号化処理終了待ち
 
 			buildBytes(enc.getBytes());
 
@@ -48,17 +48,18 @@ public class Logout extends JSocket{
 
 // FIN. 結果待ち
 			// 受信
-			check = recvBoolean();// boolean型の値を受信する true = ログアウト完了, false = ログアウト失敗
+			check = recvBoolean();
 
-			close();// 接続を閉じる
+			if(!getSocket().isClosed()) close();// 接続を閉じる
 
 		} catch (Exception e){
 		// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する
 			e.printStackTrace();// 原因の追跡を表示
+			check = false;
 			try {
 				// 接続を閉じる
-				close();
+				if(!getSocket().isClosed()) close();
 			} catch (Exception e1) {
 				// 閉じる時にエラーが起きた際の処理
 				System.out.println(e1);// エラー内容表示

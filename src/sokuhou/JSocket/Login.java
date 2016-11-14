@@ -144,18 +144,18 @@ public class Login extends JSocket{
 
 // FIN. 結果待ち
 			// 受信
-			check = recvBoolean();// boolean型の値を受信する true = ログイン完了, false = ログイン失敗
+			check = recvBoolean();
 
-			// 接続を閉じる
-			close();
+			if(!getSocket().isClosed()) close();// 接続を閉じる
 
 		} catch (Exception e){
 		// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する
 			e.printStackTrace();// 原因の追跡を表示
+			check = false;
 			try {
 				// 接続を閉じる
-				close();
+				if(!getSocket().isClosed()) close();
 			} catch (Exception e1) {
 				// 閉じる時にエラーが起きた際の処理
 				System.out.println(e1);// エラー内容表示

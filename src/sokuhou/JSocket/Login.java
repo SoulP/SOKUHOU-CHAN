@@ -1,5 +1,6 @@
 package sokuhou.JSocket;
 
+import sokuhou.cipher.JCipher;
 import sokuhou.cipher.JCipher.cipher;
 import sokuhou.cipher.JDecrypt;
 import sokuhou.cipher.JEncrypt;
@@ -35,7 +36,7 @@ public class Login extends JSocket{
 			JEncrypt enc = new JEncrypt();// 暗号化
 			enc.generateRSA_KEY();// RSA用の公開鍵と秘密鍵を生成する
 			JDecrypt dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
-			byte[] publicKEY = enc.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
+			byte[] publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
 // 03. CLがSVに接続を要求する(接続情報の接続番号は9999)
 			// アカウントの登録を要求する
@@ -79,7 +80,7 @@ public class Login extends JSocket{
 
 			// 復号化
 			dec.join();// 復号化処理終了待ち
-			key = dec.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
+			key = JCipher.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 			dec.join();// 復号化処理終了待ち

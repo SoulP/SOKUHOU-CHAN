@@ -1,9 +1,12 @@
 package sokuhou.JSocket;
 
-import sokuhou.cipher.JCipher;
-import sokuhou.cipher.JCipher.cipher;
-import sokuhou.cipher.JDecrypt;
-import sokuhou.cipher.JEncrypt;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+
+import sokuhou.JCipher.JCipher;
+import sokuhou.JCipher.JCipher.cipher;
+import sokuhou.JCipher.JDecrypt;
+import sokuhou.JCipher.JEncrypt;
 
 public class Login extends JSocket{
 	private boolean check;// 接続処理確認
@@ -19,24 +22,35 @@ public class Login extends JSocket{
 		return check;
 	}
 
+	// CHAP認証
+	private String CHAP(String password, int chap) throws UnsupportedEncodingException{
+		BigInteger bigInt = new BigInteger(password.getBytes("UTF-8"));
+		bigInt = bigInt.pow(chap);
+		return JCipher.toHashCode(JCipher.hash.SHA512, bigInt.toString());
+	}
+
 	public void run(){
+		// 初期化
+		JEncrypt enc = null;// null値で初期化
+		JDecrypt dec = null;// null値で初期化
+		byte[] publicKEY = null;// null値で初期化
+		byte[] buff = null;
+		int chap = 0;// 0で初期化
+
 		try{
 // 01. CLが接続の準備をする(初期化など)
 			// 値がない場合は、エラーとして発生させる
 			if(getEmail() == null) throw new Exception("ERROR: email value is null");
 			if(getPassword() == null) throw new Exception ("ERROR: password value is null");
 
-			// 初期化
-			rData = null;// バイト列のデータ(主に受信)
-
-			open(); // 接続を開く
+			open();// 接続を開く
 
 // 02. CLが公開鍵と秘密鍵を生成する
 			// 公開鍵と秘密鍵を生成する
-			JEncrypt enc = new JEncrypt();// 暗号化
+			enc = new JEncrypt();// 暗号化
 			enc.generateRSA_KEY();// RSA用の公開鍵と秘密鍵を生成する
-			JDecrypt dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
-			byte[] publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
+			dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
+			publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
 // 03. CLがSVに接続を要求する(接続情報の接続番号は9999)
 			// アカウントの登録を要求する
@@ -65,7 +79,7 @@ public class Login extends JSocket{
 
 // 10. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
 			// 受信
-			byte[] buff = recv("9999");
+			buff = recv("9999");
 			// 復号化
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
@@ -80,7 +94,7 @@ public class Login extends JSocket{
 
 			// 復号化
 			dec.join();// 復号化処理終了待ち
-			key = JCipher.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
+			setSecretKey(JCipher.bytes2secretKey(dec.getBytes()));// 復号化したバイト列を秘密鍵に生成
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 			dec.join();// 復号化処理終了待ち
@@ -96,27 +110,49 @@ public class Login extends JSocket{
 
 // 24. CLがSVからint型でCHAP認証用の乱数を受け取る
 			// 受信
-			int chap = recvInt();
+			chap = recvInt();
 
 // 25. CLが接続番号と接続番号用の鍵を使って、次の接続番号を生成する
 			createInfoBytes("" + nextConnect(), ctrl.READ, type.USER);// 接続情報をバイト列に出力する
 
 			// 暗号と復号の秘密鍵を設定する
-			enc = new JEncrypt(cipher.AES, key);// 暗号化
-			dec = new JDecrypt(cipher.AES, key);// 復号化
+			enc = new JEncrypt(cipher.AES, getSecretKey());// 暗号化
+			dec = new JDecrypt(cipher.AES, getSecretKey());// 復号化
 
 // 26. CLが復号化したCHAP認証用の乱数とパスワードを使って計算し、ハッシュ値に出力する
-// 27. CLがメールアドレスのハッシュ値と、計算したパスワードのハッシュ値（と、ワンタイムパスワード）をデータ情報として秘密鍵で暗号化する
-// 28. CLが暗号化したデータ情報をSVに送信する(接続情報の接続番号は25.の次の接続番号)
-// FIN. 結果待ち
+			String chapHash = CHAP(getPassword(), chap);
 
+// 27. CLがメールアドレスのハッシュ値と、計算したパスワードのハッシュ値（と、ワンタイムパスワード）をデータ情報として秘密鍵で暗号化する
+			sData = "$EMAIL:";
+			sData += JCipher.toHashCode(JCipher.hash.SHA512, getEmail());
+			sData += ";";
+			sData += "$CHAP:";
+			sData += chapHash;
+			sData += ";";
+
+			// 暗号化
+			setDataBytes(str2bytes(sData));
+			enc.setBytes(getDataBytes());
+			enc.start();
+			enc.join();
+
+			buildBytes(enc.getBytes());
+
+// 28. CLが暗号化したデータ情報をSVに送信する(接続情報の接続番号は25.の次の接続番号)
+			// 送信
+			send(getAllBytes());
+
+// FIN. 結果待ち
+			// 受信
+			check = recvBoolean();
 
 			// 接続を閉じる
 			close();
+
 		} catch (Exception e){
 		// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する
-			e.printStackTrace();;// 原因の追跡を表示
+			e.printStackTrace();// 原因の追跡を表示
 			try {
 				// 接続を閉じる
 				close();
@@ -128,6 +164,15 @@ public class Login extends JSocket{
 				setDIS(null);// 受信用ストリームをnull値で消す
 				setDOS(null);// 送信用ストリームをnull値で消す
 			}
+		}finally{
+			// 初期化
+			clearUser();// null値で初期化
+			sData = null;// null値で初期化
+			enc = null;// null値で初期化
+			dec = null;// null値で初期化
+			publicKEY = null;// null値で初期化
+			buff = null;// null値で初期化
+			chap = 0;// 0で初期化
 		}
 	}
 }

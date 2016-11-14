@@ -1,4 +1,4 @@
-package sokuhou.cipher;
+package sokuhou.JCipher;
 
 import java.security.Key;
 

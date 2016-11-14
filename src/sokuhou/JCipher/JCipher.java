@@ -1,4 +1,4 @@
-package sokuhou.cipher;
+package sokuhou.JCipher;
 
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;

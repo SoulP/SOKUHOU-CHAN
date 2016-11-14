@@ -25,9 +25,9 @@ public abstract class JSocket extends Thread{
 	private byte[] bData;// データ情報のバイト列
 	private byte[] allData;// 送信用のバイト列 (接続情報 + データ情報 + 終了コード 0x00, 0xFF, 0x00, 0xFF)
 	protected byte[] bufferData;// 受信用のバイト列
-	protected byte[] rData;// 受信したデータ情報のバイト列
+	private byte[] rData;// 受信したデータ情報のバイト列
 	protected String sData;// データ情報の文字列
-	protected SecretKey key;// 共通鍵
+	private SecretKey key;// 共通鍵
 	private String user_name, password, email, birth_day, otp;// ユーザ情報の文字列
 	private int cKEY, cNO;// 接続情報の接続番号用の鍵と接続番号
 	private List<String> info;// 接続情報のリスト
@@ -43,8 +43,6 @@ public abstract class JSocket extends Thread{
 		allData = null;// 送信用のバイト列
 		bufferData = new byte[Byte.MAX_VALUE - 1];// 受信用のバイト列
 		clearBytes(iData);// バイト列のバイト値を全て0x00にする
-		clearBytes(bData);// バイト列のバイト値を全て0x00にする
-		clearBytes(allData);// バイト列のバイト値を全て0x00にする
 		clearBytes(bufferData);// バイト列のバイト値を全て0x00にする
 		sData = null;// データ情報の文字列
 		socket = null;// 通信ソケット
@@ -254,7 +252,7 @@ public abstract class JSocket extends Thread{
 	}
 
 	// バイト列構築 接続情報 + データ情報 + 終了コード(0x00, 0xFF, 0x00, 0xFF)
-	public void buildBytes(byte[] bytes){
+	public void buildBytes(byte[] bytes){// bytes = データ情報
 		final int length = iData.length + bytes.length;
 		byte[] z = new byte[length];
 		clearBytes(z);
@@ -268,6 +266,7 @@ public abstract class JSocket extends Thread{
 			buff[++i] = (byte)0xFF;
 		}
 		allData = buff;
+		bData = bytes;
 	}
 
 	// データ情報のバイト列 入力
@@ -373,6 +372,17 @@ public abstract class JSocket extends Thread{
 	// バイト列から文字列 変換
 	public String bytes2str(byte[] bytes) throws UnsupportedEncodingException{
 		return new String(bytes, "UTF-8");// バイト列(UTF-8)を文字列に変換
+	}
+
+
+	// 共通鍵 入力
+	protected void setSecretKey(SecretKey key){
+		this.key = key;
+	}
+
+	// 共通鍵 出力
+	protected SecretKey getSecretKey(){
+		return key;
 	}
 
 	// 接続 開く
@@ -494,5 +504,13 @@ public abstract class JSocket extends Thread{
 		return otp;
 	}
 
-
+	// ユーザ情報クリア
+	protected void clearUser(){
+		// 初期化
+		setUserName(null);// null値で初期化
+		setPassword(null);// null値で初期化
+		setEmail(null);// null値で初期化
+		setBirthDay(null);// null値で初期化
+		setOTP(null);// null値で初期化
+	}
 }

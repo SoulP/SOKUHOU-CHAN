@@ -183,7 +183,12 @@ public class MainSYS {
 		*/
 		/*
 		BigInteger big = BigInteger.valueOf(1234567890);
-		String hash = JCipher.toHashCode(JCipher.hash.SHA1, big.toString());
+		String hash = JCipher.toHashCode(JCipher.hash.SHA512, big.toString());
+		System.out.println();
+		System.out.println(hash);
+		*/
+		/*
+		String hash = JCipher.toHashCode(JCipher.hash.SHA1, "aaa@aaa.aaa");
 		System.out.println();
 		System.out.println(hash);
 		*/

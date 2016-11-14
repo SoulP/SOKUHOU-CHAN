@@ -3,10 +3,10 @@ package sokuhou.JSocket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sokuhou.cipher.JCipher;
-import sokuhou.cipher.JCipher.cipher;
-import sokuhou.cipher.JDecrypt;
-import sokuhou.cipher.JEncrypt;
+import sokuhou.JCipher.JCipher;
+import sokuhou.JCipher.JCipher.cipher;
+import sokuhou.JCipher.JDecrypt;
+import sokuhou.JCipher.JEncrypt;
 
 public class AccountRegister extends JSocket{
 	private boolean check;// 登録処理確認
@@ -24,6 +24,14 @@ public class AccountRegister extends JSocket{
 
 	// 登録処理
 	public void run(){
+		// 初期化
+		JEncrypt enc = null;// null値で初期化
+		JDecrypt dec = null;// null値で初期化
+		Pattern pattern = null;// null値で初期化
+		Matcher matcher = null;// null値で初期化
+		byte[] publicKEY = null;// null値で初期化
+		byte[] buff = null;// null値で初期化
+
 		try{
 // 01. CLが接続の準備をする(初期化など)
 			// 値がない場合は、エラーとして発生させる
@@ -32,18 +40,16 @@ public class AccountRegister extends JSocket{
 			if(getPassword() == null) throw new Exception ("ERROR: password value is null");
 			if(getBirthDay() == null) throw new Exception ("ERROR: birth_day value is null");
 
-			// 初期化
-			rData = null;// バイト列のデータ(主に受信)
 
 			// 接続を開く
 			open();
 
 // 02. CLが公開鍵と秘密鍵を生成する
 			// 公開鍵と秘密鍵を生成する
-			JEncrypt enc = new JEncrypt();// 暗号化
+			enc = new JEncrypt();// 暗号化
 			enc.generateRSA_KEY();// RSA用の公開鍵と秘密鍵を生成する
-			JDecrypt dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
-			byte[] publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
+			dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
+			publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
 // 03. CLがSVに接続を要求する(接続情報の接続番号は0000)
 			// アカウントの登録を要求する
@@ -70,7 +76,7 @@ public class AccountRegister extends JSocket{
 
 // 10. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
 			// 受信
-			byte[] buff = recv("0000");
+			buff = recv("0000");
 
 			// 復号化
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
@@ -86,7 +92,7 @@ public class AccountRegister extends JSocket{
 
 			// 復号化
 			dec.join();// 復号化処理終了待ち
-			key = JCipher.bytes2secretKey(dec.getBytes());// 復号化したバイト列を秘密鍵に生成し、keyに保存する
+			setSecretKey(JCipher.bytes2secretKey(dec.getBytes()));// 復号化したバイト列を秘密鍵に生成
 			dec.setBytes(buff);// データのバイト列を復号化に入力する
 			dec.start();// 復号化開始
 			dec.join();// 復号化処理終了待ち
@@ -97,8 +103,8 @@ public class AccountRegister extends JSocket{
 			setNextConnection(connectKEY);// 次の接続番号の設定
 
 			// 暗号と復号の秘密鍵を設定する
-			enc = new JEncrypt(cipher.AES, key);// 暗号化
-			dec = new JDecrypt(cipher.AES, key);// 復号化
+			enc = new JEncrypt(cipher.AES, getSecretKey());// 暗号化
+			dec = new JDecrypt(cipher.AES, getSecretKey());// 復号化
 
 // 17. CLが接続番号と接続番号用の鍵を使って、次の接続番号を生成する
 // 18. CLがユーザが入力した情報をデータ情報として作成し、共通鍵で暗号化する
@@ -106,8 +112,8 @@ public class AccountRegister extends JSocket{
 			createInfoBytes("" + nextConnect(), ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 
 			// 確認
-			Pattern pattern = Pattern.compile("[\\s\\¥p{Punct}]");// ユーザ名用のパターン
-			Matcher matcher = pattern.matcher(getUserName());// パターンを使って、ユーザ名を確認する
+			pattern = Pattern.compile("[\\s\\¥p{Punct}]");// ユーザ名用のパターン
+			matcher = pattern.matcher(getUserName());// パターンを使って、ユーザ名を確認する
 			// ユーザ名に使用できない特殊文字もしくは空白がある場合は、エラーとして発生させる
 			if(matcher.find()) throw new Exception("ERROR: user_name can't use symbol and space");
 
@@ -152,7 +158,6 @@ public class AccountRegister extends JSocket{
 
 			// アカウント情報を送信する
 			setDataBytes(str2bytes(sData));// 文字列をバイト列に出力する
-			sData = null;// 文字列をnull値で消す
 
 			// 暗号化
 			enc.setBytes(getDataBytes());// アカウント情報のバイト列を暗号化に入力する
@@ -172,13 +177,6 @@ public class AccountRegister extends JSocket{
 			// 接続を閉じる
 			close();
 
-			// 値を消す
-			setPassword(null);// パスワードをnull値で消す
-			enc = null; // 暗号化をnull値で消す
-			dec = null; // 復号化をnull値で消す
-			pattern = null; // パターンをnull値で消す
-			matcher = null; // 確認処理をnull値で消す
-
 		} catch (Exception e){
 		// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する
@@ -194,6 +192,16 @@ public class AccountRegister extends JSocket{
 				setDIS(null);// 受信用ストリームをnull値で消す
 				setDOS(null);// 送信用ストリームをnull値で消す
 			}
+		}finally{
+			// 初期化
+			clearUser();// ユーザ情報の全てnull値で初期化
+			sData = null;// null値で初期化
+			enc = null;// null値で初期化
+			dec = null;// null値で初期化
+			pattern = null;// null値で初期化
+			matcher = null;// null値で初期化
+			publicKEY = null;// null値で初期化
+			buff = null;// null値で初期化
 		}
 	}
 

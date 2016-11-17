@@ -17,6 +17,10 @@ public class Command extends Thread{
 		return command;
 	}
 
+	private void dbCommand(String str){
+
+	}
+
 	public void run(){
 		command = true;
 		String str;
@@ -25,6 +29,7 @@ public class Command extends Thread{
 			try {
 				str = br.readLine();
 				if(str.equals("exit")) command = false;
+				if(str.substring(0, 3).equalsIgnoreCase("DB "))dbCommand(str.substring(3, str.length()));
 			} catch (IOException e) {
 				System.out.println(e);
 				e.printStackTrace();

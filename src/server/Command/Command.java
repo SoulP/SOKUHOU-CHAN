@@ -25,7 +25,7 @@ public class Command extends Thread{
 		command = true;
 		String str;
 		while(command){
-			System.out.print("sokuhou ->");
+			System.out.print("速報ちゃん ->");
 			try {
 				str = br.readLine();
 				if(str.equals("exit")) command = false;

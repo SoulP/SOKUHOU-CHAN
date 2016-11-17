@@ -3,6 +3,7 @@ package server;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import server.Command.Command;
 import server.JSocket.Service;
 
 public class MainSYS {
@@ -13,7 +14,9 @@ public class MainSYS {
 		try{
 			server = new ServerSocket(port);
 			System.out.println("速報ちゃんサーバ起動");
-			while(true){
+			Command command = new Command(System.in);
+			command.start();
+			while(command.bool()){
 				Socket socket = server.accept();
 				new Service(socket).start();
 			}

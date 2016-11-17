@@ -1,4 +1,4 @@
-package sokuhou.DataBase;
+package server.DataBase;
 
 public class DBA extends Oracle{
 	// Oracle DBA 11g

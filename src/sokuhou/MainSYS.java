@@ -1,6 +1,5 @@
 package sokuhou;
 
-import sokuhou.DataBase.DBA;
 import sokuhou.InputOutput.IOsys;
 import sokuhou.NETWORK.NetGET;
 import sokuhou.NETWORK.NetWork;
@@ -13,7 +12,6 @@ public class MainSYS {
 		nw.setURL("http://qiita.com/taiyop/items/050c6749fb693dae8f82");
 		NetWork nGET = new NetGET(nw);
 
-		DBA dba = null;
 		IOsys io = new IOsys();
 
 		// テスト-------------------------------------

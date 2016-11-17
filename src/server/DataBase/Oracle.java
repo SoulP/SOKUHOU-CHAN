@@ -1,4 +1,4 @@
-package sokuhou.DataBase;
+package server.DataBase;
 
 public abstract class Oracle extends Thread {
 	// 抽象クラス

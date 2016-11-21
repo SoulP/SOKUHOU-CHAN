@@ -1,15 +1,14 @@
 package sokuhou.Window;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.geom.Rectangle2D;
 
-import javax.swing.JFrame;
-
 // 通知フレーム
-public class Window_POP extends JFrame {
+public class Window_POP extends Frame {
 	private Image img;
 	private OPanel oPanel, imgPanel;
 	Toolkit tk;

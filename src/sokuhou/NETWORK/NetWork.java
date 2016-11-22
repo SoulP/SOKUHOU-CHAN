@@ -1,4 +1,4 @@
-package sokuhou;
+package sokuhou.NETWORK;
 
 import java.util.ArrayList;
 

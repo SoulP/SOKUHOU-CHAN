@@ -1,13 +1,12 @@
-package sokuhou;
+package sokuhou.Window;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-
-import javax.swing.JPanel;
+import java.awt.Panel;
 
 // 通知フレームのパネル
-public class OPanel extends JPanel {
+public class OPanel extends Panel {
 	private Image img;
 	private int imgWidth, imgHeight;
 	private boolean viewImage, viewBackgroundColor;

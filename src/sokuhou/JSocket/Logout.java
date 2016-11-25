@@ -1,5 +1,6 @@
 package sokuhou.JSocket;
 
+import sokuhou.MainSYS;
 import sokuhou.JCipher.JCipher;
 import sokuhou.JCipher.JEncrypt;
 
@@ -14,6 +15,9 @@ public class Logout extends JSocket{
 	public void run(){
 		// 初期化
 		JEncrypt enc = null;// null値で初期化
+
+		check = false;
+
 		try{
 			// 値がない場合は、エラーとして発生させる
 			if(getSecretKey() == null) throw new Exception("ERROR: key is null");
@@ -75,6 +79,7 @@ public class Logout extends JSocket{
 			clearInfoList();// null値で初期化
 			sData = null;// null値で初期化
 			enc = null;// null値で初期化
+			MainSYS.socket = null;// null値で初期化
 		}
 	}
 }

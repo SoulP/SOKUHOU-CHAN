@@ -1,5 +1,6 @@
 package sokuhou.JSocket;
 
+import sokuhou.MainSYS;
 import sokuhou.JCipher.JCipher;
 import sokuhou.JCipher.JDecrypt;
 import sokuhou.JCipher.JEncrypt;
@@ -39,6 +40,8 @@ public class Recv extends JSocket{
 		JEncrypt enc = null;// null値で初期化
 		JDecrypt dec = null;// null値で初期化
 		byte[] buff = null;// null値で初期化
+
+		check = false;
 
 		try{
 			// 値がない場合は、エラーとして発生させる
@@ -113,6 +116,7 @@ public class Recv extends JSocket{
 			enc = null;// null値で初期化
 			dec = null;// null値で初期化
 			buff = null;// null値で初期化
+			MainSYS.socket = this;// 情報保持
 		}
 	}
 }

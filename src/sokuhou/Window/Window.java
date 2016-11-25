@@ -43,6 +43,8 @@ public class Window extends Frame implements WindowListener, Runnable{
 				mode = menu.getMode();
 				if(mode == 0x21){
 					win.setVisible(true);
+					qr.setImage("https://chart.googleapis.com/chart?chs=200x200&chld=M%7C0&cht=qr&chl=otpauth%3A%2F%2Ftotp%2F%25E9%2580%259F%25E5%25A0%25B1%25E3%2581%25A1%25E3%2582%2583%25E3%2582%2593%3AtestUSER%40sokuhou.soulp.moe%3Fsecret%3DGK3R4GZYC4G4TRC5%26issuer%3D%25E9%2580%259F%25E5%25A0%25B1%25E3%2581%25A1%25E3%2582%2583%25E3%2582%2593");
+					qr.setVisible(true);
 				}
 			}
 		}

@@ -10,14 +10,21 @@ import java.awt.Panel;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
-public class QRcodeViewer extends Frame implements WindowListener, ActionListener{
+import sokuhou.JSocket.JSocket;
+import sokuhou.JSocket.Send;
+
+public class QRcodeViewer extends Frame implements WindowListener, ActionListener, MouseListener{
 
 	Panel panel;
 	QRimage image;
@@ -35,10 +42,11 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		image = new QRimage();
 		image.setVisible(true);
 
-		label = new Label("6桁のコード: ");
+		label = new Label("認証コード: ");
 		label.setVisible(true);
 
 		text = new TextField();
+		text.addMouseListener(this);
 		text.setVisible(true);
 
 		button = new Button("確認");
@@ -73,6 +81,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		button.setLocation((int)(panel.getSize().width * 0.5) - (int)(button.getSize().width * 0.5), text.getLocation().y + text.getSize().height + 10);
 
 		pack();
+		text.setText("認証コード入力して下さい。");
 	}
 
 	public synchronized void setImage(String url){
@@ -136,6 +145,57 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+		if(e.getSource() == button){
+			if(!text.getText().isEmpty()){
+				Pattern pattern = Pattern.compile("^\\d{6}\\d*$");
+				Matcher matcher = pattern.matcher(text.getText());
+				if(matcher.find()){
+					Send send = (Send)sokuhou.MainSYS.socket;
+					send.setSend("$OTP:" + text.getText() + ";");
+					send.setDataType(JSocket.type.USER);
+					send.start();
+					try {
+						send.join();
+						if(send.check()) setVisible(false); else text.setText("認証確認失敗、正しい認証コード入力して下さい。");
+					} catch (InterruptedException e1) {
+						System.out.println(e1);
+						e1.printStackTrace();
+					}
+				}else{
+					text.setText("認証コード入力して下さい。");
+				}
+			}
+		}
+		System.out.println(e);
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+		if(e.getSource() == text) text.setText("");
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}

@@ -25,6 +25,8 @@ public class AccountRegister extends JSocket{
 		byte[] publicKEY = null;// null値で初期化
 		byte[] buff = null;// null値で初期化
 
+		check = false;
+
 		try{
 // 01. CLが接続の準備をする(初期化など)
 			// 値がない場合は、エラーとして発生させる

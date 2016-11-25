@@ -1,10 +1,12 @@
 package sokuhou;
 
 import sokuhou.InputOutput.IOsys;
+import sokuhou.JSocket.JSocket;
 import sokuhou.NETWORK.NetGET;
 import sokuhou.NETWORK.NetWork;
 
 public class MainSYS {
+	public static JSocket socket;
 
 	public static void main(String[] args) {
 		// メインシステム

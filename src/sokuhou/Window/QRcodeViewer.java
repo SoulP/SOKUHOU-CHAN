@@ -24,50 +24,61 @@ import javax.imageio.ImageIO;
 import sokuhou.JSocket.JSocket;
 import sokuhou.JSocket.Send;
 
+// QRコード表示
 public class QRcodeViewer extends Frame implements WindowListener, ActionListener, MouseListener{
 
+	// インスタンス変数
 	Panel panel;
 	QRimage image;
 	Label label;
 	TextField text;
 	Button button;
+	final String textInputCode = "認証コード入力して下さい。";
 
+	// コンストラクタ
 	public QRcodeViewer(){
 
-		panel = new Panel();
-		panel.setLocation(0,  0);
-		panel.setLayout(null);
-		panel.setVisible(true);
+		// メインパネル
+		panel = new Panel();// オブジェクト生成
+		panel.setLocation(0, 0);// 0, 0の座標位置に設定
+		panel.setLayout(null);// レイアウト無効化
+		panel.setVisible(true);// 可視化
 
-		image = new QRimage();
-		image.setVisible(true);
+		// 画像用のパネル
+		image = new QRimage();// オブジェクト生成
+		image.setVisible(true);// 可視化
 
-		label = new Label("認証コード: ");
-		label.setVisible(true);
+		// ラベル
+		label = new Label("認証コード: ");// オブジェクト生成
+		label.setVisible(true);// 可視化
 
-		text = new TextField();
-		text.addMouseListener(this);
-		text.setVisible(true);
+		// テキストフィールド
+		text = new TextField();// オブジェクト生成
+		text.addMouseListener(this);// マウスリスナー追加
+		text.setVisible(true);// 可視化
 
-		button = new Button("確認");
-		button.addActionListener(this);
-		button.setVisible(true);
+		// ボタン
+		button = new Button("確認");// オブジェクト生成
+		button.addActionListener(this);// アクションリスナー追加
+		button.setVisible(true);// 可視化
 
+		// 各コンポネントをメインパネルに追加
 		panel.add(image);
 		panel.add(label);
 		panel.add(text);
 		panel.add(button);
 
-		setTitle("2要素認証(ワンタイムパスワード) - QRコード");
-		setSize(400, 500);
-		setPreferredSize(new Dimension(400, 500));
-		setLocationRelativeTo(null);
-		setResizable(false);
-		setVisible(false);
-		addWindowListener(this);
+		// メインフレーム
+		setTitle("2要素認証(ワンタイムパスワード) - QRコード");// タイトル設定
+		setSize(400, 500);// サイズ設定
+		setPreferredSize(new Dimension(400, 500));// サイズ設定
+		setLocationRelativeTo(null);// デスクトップからの座標初期化(フレームを中央に表示)
+		setResizable(false);// フレームサイズ変更不可
+		setVisible(false);// 不可視化
+		addWindowListener(this);// ウィンドウリスナー追加
+		add(panel);// メインパネルをメインフレームに追加
 
-		add(panel);
-
+		// 各コンポネントのサイズと座標位置を調整
 		panel.setSize(getSize());
 
 		image.setSize((int)(panel.getWidth() * 0.9), (int)(panel.getWidth() * 0.9));
@@ -80,10 +91,14 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		button.setSize(50, 30);
 		button.setLocation((int)(panel.getSize().width * 0.5) - (int)(button.getSize().width * 0.5), text.getLocation().y + text.getSize().height + 10);
 
+		// フレーム全体調整
 		pack();
-		text.setText("認証コード入力して下さい。");
+
+		// 初期値設定
+		text.setText(textInputCode);
 	}
 
+	// 画像 入力: 文字列 (URLアドレス)
 	public synchronized void setImage(String url){
 		try{
 			setImage(ImageIO.read(new URL(url).openStream()));
@@ -93,10 +108,12 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		}
 	}
 
+	// 画像 入力: イメージ
 	public synchronized void setImage(BufferedImage image){
 		this.image.setImage(image);
 	}
 
+	// 画像 出力: イメージ
 	public synchronized Image getImage(){
 		return image.getImage();
 	}
@@ -145,35 +162,36 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
+		// ボタンのイベント
 		if(e.getSource() == button){
-			if(!text.getText().isEmpty()){
-				final Pattern pattern = Pattern.compile("^\\d{6}\\d*$");
-				Matcher matcher = pattern.matcher(text.getText());
-				if(matcher.find()){
+			if(!text.getText().isEmpty()){// テキストフィールド確認
+				final Pattern pattern = Pattern.compile("^\\d{6}\\d*$");// パターン設定
+				Matcher matcher = pattern.matcher(text.getText());// パターン設定
+				if(matcher.find()){// 文字列に問題ない場合
+					// 送信
 					Send send = (Send)sokuhou.MainSYS.socket;
 					send.setSend("$OTP:" + text.getText() + ";");
 					send.setDataType(JSocket.type.USER);
 					send.start();
 					try {
 						send.join();
-						if(send.check()) setVisible(false); else text.setText("認証確認失敗、正しい認証コード入力して下さい。");
+						if(send.check()) setVisible(false);// 送信成功した場合
+						else text.setText("認証確認失敗、正しい認証コード入力して下さい。");// 送信失敗した場合
 					} catch (InterruptedException e1) {
-						System.out.println(e1);
-						e1.printStackTrace();
+						System.out.println(e1);// エラー内容表示
+						e1.printStackTrace();// 原因追跡表示
 					}
-				}else{
-					text.setText("認証コード入力して下さい。");
+				}else{// 文字列に問題ある場合
+					text.setText(textInputCode);
 				}
 			}
 		}
-		System.out.println(e);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-		if(e.getSource() == text) text.setText("");
+		// テキストフィールド
+		if(e.getSource() == text) text.setText("");// テキストフィールド内にクリックした時に文字列をクリアにする
 	}
 
 	@Override
@@ -203,27 +221,35 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 
 }
 
+// 画像用のパネル
 class QRimage extends Panel{
-	BufferedImage image;
+	// インスタンス変数
+	BufferedImage image;// 画像
 
+	// コンストラクタ
 	QRimage(){
 		image = null;
 	}
 
+	// コンストラクタ
 	QRimage(BufferedImage image){
 		this.image = image;
 	}
 
+	// 画像 入力: イメージ
 	public synchronized void setImage(BufferedImage image){
 		this.image = image;
 	}
 
+	// 画像 出力: イメージ
 	public synchronized Image getImage(){
 		return image;
 	}
 
+	// 描画
 	@Override
 	public void paint(Graphics g){
-		if(image != null) g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+		if(image != null) g.drawImage(image, 0, 0, getWidth(), getHeight(), null);// 画像がある場合、画像をパネルに描画する
 	}
+
 }

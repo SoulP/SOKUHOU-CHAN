@@ -148,7 +148,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		// TODO 自動生成されたメソッド・スタブ
 		if(e.getSource() == button){
 			if(!text.getText().isEmpty()){
-				Pattern pattern = Pattern.compile("^\\d{6}\\d*$");
+				final Pattern pattern = Pattern.compile("^\\d{6}\\d*$");
 				Matcher matcher = pattern.matcher(text.getText());
 				if(matcher.find()){
 					Send send = (Send)sokuhou.MainSYS.socket;

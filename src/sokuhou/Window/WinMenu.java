@@ -19,8 +19,8 @@ public class WinMenu extends MenuBar implements ActionListener{
 	String[] editItemUS = {"Add Read later", "Remove Read later", "Add Bookmark", "Remove Bookmark", "GOOD", "BAD"};
 	String[][] editItemLang = {editItemJP, editItemUS};
 
-	String[] optionItemJP = {"単語登録", "名前変更", "メールアドレス変更", "パスワード変更", "保護者管理", "退会"};
-	String[] optionItemUS = {"Add Keywords", "Change Name", "Change Email address", "Change Password", "Guardian Management", "Withdrawal"};
+	String[] optionItemJP = {"単語登録", "アカウント管理"};
+	String[] optionItemUS = {"Add Keywords", "Account Management"};
 	String[][] optionItemLang = {optionItemJP, optionItemUS};
 
 	Menu[] wMenu = new Menu[4];
@@ -28,6 +28,7 @@ public class WinMenu extends MenuBar implements ActionListener{
 	MenuItem[] editItem;
 	MenuItem[] optionItem;
 
+	int mode;
 
 	WinMenu(){
 		for(int i = 0; i < wMenu.length; i++){
@@ -40,17 +41,21 @@ public class WinMenu extends MenuBar implements ActionListener{
 
 		for(int i = 0; i < fileItem.length; i++) fileItem[i] = new MenuItem(fileItemLang[0][i]);
 
-		editItem = new MenuItem[4];
+		editItem = new MenuItem[editItemLang[0].length];
 		for(int i = 0; i < editItem.length; i++) editItem[i] = new MenuItem();
 		editItem[0].setLabel(editItemLang[0][0]);
 		editItem[1].setLabel(editItemLang[0][2]);
 		editItem[2].setLabel(editItemLang[0][4]);
 		editItem[3].setLabel(editItemLang[0][5]);
 
+		optionItem = new MenuItem[optionItemLang[0].length];
+		for(int i = 0; i < optionItem.length; i++) optionItem[i] = new MenuItem(optionItemLang[0][i]);
+
 		ItemsEnabled(fileItem, false);
 		ItemsEnabled(editItem, false);
 		ItemsAddListener(fileItem);
 		ItemsAddListener(editItem);
+		ItemsAddListener(optionItem);
 
 		fileItem[4].setEnabled(true);
 
@@ -68,6 +73,12 @@ public class WinMenu extends MenuBar implements ActionListener{
 		wMenu[1].addSeparator();
 		wMenu[1].add(editItem[2]);
 		wMenu[1].add(editItem[3]);
+
+		wMenu[2].add(optionItem[0]);
+		wMenu[2].addSeparator();
+		wMenu[2].add(optionItem[1]);
+
+		mode = 0;
 	}
 
 	private void ItemsAddListener(MenuItem[] items){
@@ -78,9 +89,16 @@ public class WinMenu extends MenuBar implements ActionListener{
 		for(MenuItem item : items) item.setEnabled(bool);
 	}
 
+	public synchronized int getMode(){
+		return mode;
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
 		if(e.getSource() == fileItem[4]) System.exit(0);
+		for(int i = 0; i < fileItem.length -1; i++) if(e.getSource() == fileItem[i]) mode = i + 0x01;
+		for(int i = 0; i < editItem.length; i++) if(e.getSource() == editItem[i]) mode = i + 0x11;
+		for(int i = 0; i < optionItem.length; i++) if(e.getSource() == optionItem[i]) mode = i + 0x21;
 	}
 }

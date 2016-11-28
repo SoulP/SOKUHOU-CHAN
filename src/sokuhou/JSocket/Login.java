@@ -3,6 +3,7 @@ package sokuhou.JSocket;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
+import sokuhou.MainSYS;
 import sokuhou.JCipher.JCipher;
 import sokuhou.JCipher.JCipher.cipher;
 import sokuhou.JCipher.JDecrypt;
@@ -30,6 +31,8 @@ public class Login extends JSocket{
 		byte[] publicKEY = null;// null値で初期化
 		byte[] buff = null;
 		int chap = 0;// 0で初期化
+
+		check = false;
 
 		try{
 // 01. CLが接続の準備をする(初期化など)
@@ -174,6 +177,7 @@ public class Login extends JSocket{
 			publicKEY = null;// null値で初期化
 			buff = null;// null値で初期化
 			chap = 0;// 0で初期化
+			MainSYS.socket = this;// 情報保持
 		}
 	}
 }

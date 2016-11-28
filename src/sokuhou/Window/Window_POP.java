@@ -8,7 +8,7 @@ import java.awt.Toolkit;
 import java.awt.geom.Rectangle2D;
 
 // 通知フレーム
-public class Window_POP extends Frame {
+public class Window_POP extends Frame implements Runnable{
 	private Image img;
 	private OPanel oPanel, imgPanel;
 	Toolkit tk;
@@ -62,6 +62,12 @@ public class Window_POP extends Frame {
 	// 出力: パネルの画像 表示・非表示
 	public boolean isViewImagePanel(){
 		return imgPanel.isViewImage();
+	}
+
+	@Override
+	public void run() {
+		// TODO 自動生成されたメソッド・スタブ
+
 	}
 
 }

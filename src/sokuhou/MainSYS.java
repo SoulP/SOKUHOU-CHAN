@@ -1,10 +1,12 @@
 package sokuhou;
 
 import sokuhou.InputOutput.IOsys;
+import sokuhou.JSocket.JSocket;
 import sokuhou.NETWORK.NetGET;
 import sokuhou.NETWORK.NetWork;
 
 public class MainSYS {
+	public static JSocket socket;
 
 	public static void main(String[] args) {
 		// メインシステム
@@ -13,6 +15,7 @@ public class MainSYS {
 		NetWork nGET = new NetGET(nw);
 
 		IOsys io = new IOsys();
+		io.win_Thread.start();
 
 		// テスト-------------------------------------
 		// テスト; 接続開始
@@ -50,7 +53,6 @@ public class MainSYS {
 		io.winPOP.setImage2Panel(nw.getBuffImage());
 		io.winPOP.setViewImagePanel(true);
 		io.winPOP.setVisible(true);
-
 		/* システムトレイアイコン(タスクバー)
 		TrayIcon icon = new TrayIcon(nw.getBuffImage());
 		try {

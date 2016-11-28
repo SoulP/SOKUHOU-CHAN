@@ -13,6 +13,7 @@ public class IOsys extends IO{
 
 	public Window window;
 	public Window_POP winPOP;
+	public Thread win_Thread, winPOP_Thread;
 	private Dimension screenSizeFull;
 	private Dimension screenSize;
 	public Toolkit tk;
@@ -23,6 +24,8 @@ public class IOsys extends IO{
 	public IOsys(){
 		window = new Window();
 		winPOP = new Window_POP();
+		win_Thread = new Thread(window);
+		winPOP_Thread = new Thread(winPOP);
 		tk = Toolkit.getDefaultToolkit();
 		tray = (SystemTray.isSupported())? SystemTray.getSystemTray() : null;
 		env = (!GraphicsEnvironment.isHeadless())? GraphicsEnvironment.getLocalGraphicsEnvironment() : null;

@@ -16,8 +16,8 @@ import javax.crypto.SecretKey;
 public abstract class JSocket extends Thread{
 	final int port;// 接続先のポート番号
 	final String host;// 接続先のホスト名/ドメイン名/IPアドレス
-	enum ctrl { NULL, READ, WRITE, DELETE };// 接続情報の操作
-	enum type { NULL, USER, DATA, OPTION };// 接続情報の種類
+	public enum ctrl { NULL, READ, WRITE, DELETE };// 接続情報の操作
+	public enum type { NULL, USER, DATA, OPTION };// 接続情報の種類
 	private Socket socket;// 通信ソケット
 	private DataOutputStream dos;// 送信用ストリーム
 	private DataInputStream dis;// 受信用ストリーム

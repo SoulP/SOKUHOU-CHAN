@@ -7,15 +7,17 @@ import sokuhou.NETWORK.NetWork;
 
 public class MainSYS {
 	public static JSocket socket;
+	public volatile static Lang lang;
 
 	public static void main(String[] args) {
 		// メインシステム
+		lang = new Lang();
+
 		NetWork nw = new NetWork();
 		nw.setURL("http://qiita.com/taiyop/items/050c6749fb693dae8f82");
 		NetWork nGET = new NetGET(nw);
 
 		IOsys io = new IOsys();
-		io.win_Thread.start();
 
 		// テスト-------------------------------------
 		// テスト; 接続開始

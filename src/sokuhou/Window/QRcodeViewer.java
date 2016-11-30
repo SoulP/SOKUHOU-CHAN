@@ -16,27 +16,37 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+import javax.swing.event.EventListenerList;
 
+import sokuhou.JEvent.LangEvent;
+import sokuhou.JEvent.EventListener.LangEventListener;
 import sokuhou.JSocket.JSocket;
 import sokuhou.JSocket.Send;
 
 // QRコード表示
-public class QRcodeViewer extends Frame implements WindowListener, ActionListener, MouseListener{
+public class QRcodeViewer extends Frame implements WindowListener, ActionListener, MouseListener, Runnable{
 
 	// インスタンス変数
-	Panel panel;
-	QRimage image;
-	Label label;
-	TextField text;
-	Button button;
-	final String textInputCode = "認証コード入力して下さい。";
+	volatile ResourceBundle rb;
+	EventListenerList evList;
+
+	public Panel panel;
+	public QRimage image;
+	public Label label;
+	public TextField text;
+	public Button button;
+	public volatile String str01, str02;
 
 	// コンストラクタ
 	public QRcodeViewer(){
+		// 初期化
+		rb = sokuhou.MainSYS.lang.getResBundle();
+		evList = new EventListenerList();
 
 		// メインパネル
 		panel = new Panel();// オブジェクト生成
@@ -49,7 +59,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		image.setVisible(true);// 可視化
 
 		// ラベル
-		label = new Label("認証コード: ");// オブジェクト生成
+		label = new Label(rb.getString("qr.authcode"));// オブジェクト生成
 		label.setVisible(true);// 可視化
 
 		// テキストフィールド
@@ -58,7 +68,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		text.setVisible(true);// 可視化
 
 		// ボタン
-		button = new Button("確認");// オブジェクト生成
+		button = new Button(rb.getString("qr.confirm"));// オブジェクト生成
 		button.addActionListener(this);// アクションリスナー追加
 		button.setVisible(true);// 可視化
 
@@ -69,7 +79,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		panel.add(button);
 
 		// メインフレーム
-		setTitle("2要素認証(ワンタイムパスワード) - QRコード");// タイトル設定
+		setTitle(rb.getString("qr.title"));// タイトル設定
 		setSize(400, 500);// サイズ設定
 		setPreferredSize(new Dimension(400, 500));// サイズ設定
 		setLocationRelativeTo(null);// デスクトップからの座標初期化(フレームを中央に表示)
@@ -95,7 +105,9 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		pack();
 
 		// 初期値設定
-		text.setText(textInputCode);
+		str01 = rb.getString("qr.text01");
+		str02 = rb.getString("qr.text02");
+		text.setText(str01);
 	}
 
 	// 画像 入力: 文字列 (URLアドレス)
@@ -176,14 +188,16 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 					try {
 						send.join();
 						if(send.check()) setVisible(false);// 送信成功した場合
-						else text.setText("認証確認失敗、正しい認証コード入力して下さい。");// 送信失敗した場合
+						else text.setText(str02);// 送信失敗した場合
 					} catch (InterruptedException e1) {
 						System.out.println(e1);// エラー内容表示
 						e1.printStackTrace();// 原因追跡表示
 					}
 				}else{// 文字列に問題ある場合
-					text.setText(textInputCode);
+					text.setText(str01);
 				}
+			}else{// 空白の場合
+				text.setText(str01);
 			}
 		}
 	}
@@ -196,14 +210,14 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-
+		// テキストフィールド
+		if(e.getSource() == text) text.setText("");// テキストフィールド内にクリックした時に文字列をクリアにする
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-
+		// テキストフィールド
+		if(e.getSource() == text) text.setText("");// テキストフィールド内にクリックした時に文字列をクリアにする
 	}
 
 	@Override
@@ -218,7 +232,32 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 
 	}
 
+	public void addLangEventListener(LangEventListener l){
+		if(l == null) return;
+		evList.add(LangEventListener.class, l);
+	}
 
+	public void removeLangEventListener(LangEventListener l){
+		if(l == null) return;
+		evList.remove(LangEventListener.class, l);
+	}
+
+	private void fireUpdateLang(){
+		LangEvent evt = new LangEvent(this);
+		for(LangEventListener listener : evList.getListeners(LangEventListener.class)){
+			listener.updateLang(evt);
+		}
+	}
+
+	@Override
+	public void run() {
+		while(true){
+			if(!rb.equals(sokuhou.MainSYS.lang.getResBundle())) {
+				fireUpdateLang();
+				rb = sokuhou.MainSYS.lang.getResBundle();
+			}
+		}
+	}
 }
 
 // 画像用のパネル

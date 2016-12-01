@@ -6,14 +6,14 @@ import java.util.ResourceBundle;
 public class Lang {
 	// インスタンス変数
 	volatile private ResourceBundle rb;
-	private final String str = "language/lang";
+	private final String RESOURCE_PROPERTIES = "resource/language/lang";
 
 	public Lang(){
-		rb = ResourceBundle.getBundle(str);
+		rb = ResourceBundle.getBundle(RESOURCE_PROPERTIES);
 	}
 
 	public Lang(Locale locale){
-		rb = ResourceBundle.getBundle(str, locale);
+		rb = ResourceBundle.getBundle(RESOURCE_PROPERTIES, locale);
 	}
 
 	public void setResBundle(ResourceBundle rb){
@@ -25,6 +25,6 @@ public class Lang {
 	}
 
 	public void changeLocale(Locale locale){
-		rb = ResourceBundle.getBundle(str, locale);
+		rb = ResourceBundle.getBundle(RESOURCE_PROPERTIES, locale);
 	}
 }

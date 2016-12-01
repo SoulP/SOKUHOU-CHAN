@@ -1,9 +1,12 @@
 package sokuhou;
 
-import sokuhou.InputOutput.IOsys;
-import sokuhou.JSocket.JSocket;
-import sokuhou.NETWORK.NetGET;
-import sokuhou.NETWORK.NetWork;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+
+import sokuhou.io.IOsys;
+import sokuhou.network.NetGET;
+import sokuhou.network.NetWork;
+import sokuhou.socket.JSocket;
 
 public class MainSYS {
 	public static JSocket socket;
@@ -11,6 +14,18 @@ public class MainSYS {
 
 	public static void main(String[] args) {
 		// メインシステム
+
+		// デフォルトエンコードをUTF-8に変更する
+		try {
+			System.setProperty("file.encoding", "UTF-8");
+			Field charset;
+			charset = Charset.class.getDeclaredField("defaultCharset");
+			charset.setAccessible(true);
+			charset.set(null,null);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
 		lang = new Lang();
 
 		NetWork nw = new NetWork();

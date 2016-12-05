@@ -1,14 +1,29 @@
 package server;
 
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
-import server.Command.Command;
-import server.JSocket.Service;
+import server.command.Command;
+import server.socket.Service;
 
 public class MainSYS {
 
 	public static void main(String[] args) {
+		// メインシステム
+
+		// デフォルトエンコードをUTF-8に変更する
+		try {
+			System.setProperty("file.encoding", "UTF-8");
+			Field charset;
+			charset = Charset.class.getDeclaredField("defaultCharset");
+			charset.setAccessible(true);
+			charset.set(null,null);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
 		final int port = 55324;
 		ServerSocket server = null;
 		try{

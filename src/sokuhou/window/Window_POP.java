@@ -1,14 +1,16 @@
 package sokuhou.window;
 
 import java.awt.Color;
-import java.awt.Frame;
+import java.awt.Container;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.JFrame;
+
 // 通知フレーム
-public class Window_POP extends Frame implements Runnable{
+public class Window_POP extends JFrame implements Runnable{
 	private Image img;
 	private OPanel oPanel, imgPanel;
 	Toolkit tk;
@@ -29,8 +31,9 @@ public class Window_POP extends Frame implements Runnable{
 		imgPanel.setImageSize(temp, temp);
 		oPanel.setSize(getWidth() - imgPanel.getWidth(), getHeight());
 		oPanel.setLocation(imgPanel.getWidth(), 0);
-		add(imgPanel);
-		add(oPanel);
+		Container p = getContentPane();
+		p.add(imgPanel);
+		p.add(oPanel);
 		setBackground(Color.DARK_GRAY);
 	}
 

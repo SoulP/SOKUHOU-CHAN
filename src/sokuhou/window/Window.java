@@ -1,45 +1,44 @@
 package sokuhou.window;
 
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.MenuBar;
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.InputStream;
 import java.util.ResourceBundle;
 
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.event.EventListenerList;
 
 import sokuhou.event.LangEvent;
 import sokuhou.event.EventListener.LangEventListener;
 
 // メインフレーム
-public class Window extends Frame implements WindowListener, Runnable{
+public class Window extends JFrame implements WindowListener, KeyListener, Runnable{
 	// インスタンス変数
 	volatile ResourceBundle rb;
 	EventListenerList evList;
 
-	WinPanel win;
-	WinMenu menu;
-	QRcodeViewer qr;
+	volatile WinPanel win;
+	volatile WinMenu menu;
+	Container p;
+	volatile QRcodeViewer qr;
 
 	// コンストラクタ
-	public Window(){
+	public Window(JMenuBar menu){
 		rb = sokuhou.MainSYS.lang.getResBundle();
 		evList = new EventListenerList();
 
-		setTitle(rb.getString("title"));
-		setSize(640, 360);
-		setPreferredSize(new Dimension(640, 360));
-		setLocationRelativeTo(null);
-		setVisible(true);
-		setLayout(null);
-		setResizable(false);
-		addWindowListener(this);
-
 		win = new WinPanel();
-		add(win);
-
-		pack();
+		p = getContentPane();
+		p.setBackground(Color.WHITE);
+		p.add(win);
 
 		/*
 		if(qr == null) qr = new QRcodeViewer();
@@ -48,6 +47,24 @@ public class Window extends Frame implements WindowListener, Runnable{
 		if(!qr.isVisible()) qr = null;
 		*/
 
+		InputStream stream = ClassLoader.getSystemResourceAsStream("resource/img/dummy.png");
+		Image icon = null;
+		try {
+			icon = ImageIO.read(stream);
+		}catch (Exception e){
+		}
+		setTitle(rb.getString("title"));
+		setSize(640, 360);
+		setPreferredSize(new Dimension(640, 360));
+		setLocationRelativeTo(null);
+		setVisible(true);
+		setLayout(null);
+		setResizable(false);
+		setJMenuBar(menu);
+		setIconImage(icon);
+		addWindowListener(this);
+		addKeyListener(this);
+		pack();
 	}
 
 	public void run(){
@@ -66,12 +83,12 @@ public class Window extends Frame implements WindowListener, Runnable{
 		}
 	}
 
-	public synchronized void setMenuBar(MenuBar menu){
+	public synchronized void setJMenuBar(JMenuBar menu){
 		this.menu = (WinMenu) menu;
-		super.setMenuBar(menu);
+		super.setJMenuBar(menu);
 	}
 
-	public synchronized MenuBar getMenuBar(){
+	public synchronized JMenuBar getJMenuBar(){
 		return menu;
 	}
 
@@ -133,5 +150,20 @@ public class Window extends Frame implements WindowListener, Runnable{
 		for(LangEventListener listener : evList.getListeners(LangEventListener.class)){
 			listener.updateLang(evt);
 		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
 	}
 }

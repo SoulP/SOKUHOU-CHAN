@@ -1,13 +1,8 @@
 package sokuhou.window;
 
-import java.awt.Button;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Label;
-import java.awt.Panel;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -21,6 +16,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.EventListenerList;
 
 import sokuhou.event.LangEvent;
@@ -29,17 +29,17 @@ import sokuhou.socket.JSocket;
 import sokuhou.socket.Send;
 
 // QRコード表示
-public class QRcodeViewer extends Frame implements WindowListener, ActionListener, MouseListener, Runnable{
+public class QRcodeViewer extends JFrame implements WindowListener, ActionListener, MouseListener, Runnable{
 
 	// インスタンス変数
 	volatile ResourceBundle rb;
 	EventListenerList evList;
 
-	public Panel panel;
+	public JPanel panel;
 	public QRimage image;
-	public Label label;
-	public TextField text;
-	public Button button;
+	public JLabel label;
+	public JTextField text;
+	public JButton button;
 	public volatile String str01, str02;
 
 	// コンストラクタ
@@ -49,7 +49,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		evList = new EventListenerList();
 
 		// メインパネル
-		panel = new Panel();// オブジェクト生成
+		panel = new JPanel();// オブジェクト生成
 		panel.setLocation(0, 0);// 0, 0の座標位置に設定
 		panel.setLayout(null);// レイアウト無効化
 		panel.setVisible(true);// 可視化
@@ -59,16 +59,16 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		image.setVisible(true);// 可視化
 
 		// ラベル
-		label = new Label(rb.getString("qr.authcode"));// オブジェクト生成
+		label = new JLabel(rb.getString("qr.authcode"));// オブジェクト生成
 		label.setVisible(true);// 可視化
 
 		// テキストフィールド
-		text = new TextField();// オブジェクト生成
+		text = new JTextField();// オブジェクト生成
 		text.addMouseListener(this);// マウスリスナー追加
 		text.setVisible(true);// 可視化
 
 		// ボタン
-		button = new Button(rb.getString("qr.confirm"));// オブジェクト生成
+		button = new JButton(rb.getString("qr.confirm"));// オブジェクト生成
 		button.addActionListener(this);// アクションリスナー追加
 		button.setVisible(true);// 可視化
 
@@ -98,7 +98,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 		label.setSize(80, 20);
 		text.setLocation(label.getX() + label.getWidth() + 10, image.getY() + image.getHeight() + 10);
 		text.setSize(image.getX() + image.getWidth() - text.getX(), 20);
-		button.setSize(50, 30);
+		button.setSize(button.getText().length()*30, 30);
 		button.setLocation((int)(panel.getSize().width * 0.5) - (int)(button.getSize().width * 0.5), text.getLocation().y + text.getSize().height + 10);
 
 		// フレーム全体調整
@@ -261,7 +261,7 @@ public class QRcodeViewer extends Frame implements WindowListener, ActionListene
 }
 
 // 画像用のパネル
-class QRimage extends Panel{
+class QRimage extends JPanel{
 	// インスタンス変数
 	BufferedImage image;// 画像
 

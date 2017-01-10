@@ -264,7 +264,7 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		return mode;
 	}
 
-	// 言語選択 上
+	// 言語選択 ▲
 	private void goUP(){
 		if(langMin <= 1) return;
 		langItems[--langMin].setVisible(true);
@@ -277,7 +277,7 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		down.setEnabled(langMax+1 < langItems.length);
 	}
 
-	// 言語選択 下
+	// 言語選択 ▼
 	private void goDOWN(){
 		if(langMax >= langItems.length) return;
 		langItems[langMin++].setVisible(false);
@@ -293,8 +293,9 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-		if(e.getSource() == fileItems[4]) System.exit(0);
+		// 終了
+		if(e.getSource() == fileItems[4]) System.exit(0);// 強制終了
+		// ▲
 		if(e.getSource() == up){
             Container c = SwingUtilities.getAncestorOfClass(JPopupMenu.class, (Component) e.getSource());
             if (c instanceof JPopupMenu) ((JPopupMenu) c).setVisible(true);
@@ -302,6 +303,7 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
             if (c instanceof JPopupMenu) ((JPopupMenu) c).setVisible(true);
             goUP();
 		}
+		// ▼
 		if(e.getSource() == down){
 			Container c = SwingUtilities.getAncestorOfClass(JPopupMenu.class, (Component) e.getSource());
             if (c instanceof JPopupMenu) ((JPopupMenu) c).setVisible(true);
@@ -309,7 +311,9 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
             if (c instanceof JPopupMenu) ((JPopupMenu) c).setVisible(true);
             goDOWN();
 		}
+		// バージョン
 		if(e.getSource() == version){
+			// ダイアログ表示
 			try{
 				InputStream input = new FileInputStream("lib/resource/info.properties");
 				pro.load(input);
@@ -321,18 +325,21 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 				e1.printStackTrace();
 			}
 		}
+		// ファイルの各メニュー
 		for(int i = 0; i < fileItems.length -1; i++){
 			if(e.getSource() == fileItems[i]){
 				mode = i + 0x01;
 				break;
 			}
 		}
+		// 編集の各メニュー
 		for(int i = 0; i < editItems.length; i++){
 			if(e.getSource() == editItems[i]){
 				mode = i + 0x11;
 				break;
 			}
 		}
+		// 設定の各メニュー
 		for(int i = 0; i < settingItems.length; i++){
 			if(e.getSource() == settingItems[i]){
 				mode = i + 0x21;
@@ -351,16 +358,19 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		}
 	}
 
+	// イベントリスナ追加
 	public void addLangEventListener(LangEventListener l){
 		if(l == null) return;
 		evList.add(LangEventListener.class, l);
 	}
 
+	// イベントリスナ削除
 	public void removeLangEventListener(LangEventListener l){
 		if(l == null) return;
 		evList.remove(LangEventListener.class, l);
 	}
 
+	// イベント発生
 	private void fireUpdateLang(){
 		LangEvent evt = new LangEvent(this);
 		for(LangEventListener listener : evList.getListeners(LangEventListener.class)){

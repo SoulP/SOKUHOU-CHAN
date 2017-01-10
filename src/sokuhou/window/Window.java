@@ -160,6 +160,13 @@ public class Window extends JFrame implements WindowListener, KeyListener, Runna
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
+		/*
+		if(e.getKeyCode() == KeyEvent.VK_ALT){
+			menu.wMenu[0].getMouseListeners()[0].mousePressed(
+					new MouseEvent(menu.wMenu[0], MouseEvent.MOUSE_PRESSED,
+							System.currentTimeMillis(), 0, 0, 0, 0, false, MouseEvent.BUTTON1));
+		}
+		*/
 	}
 
 	@Override

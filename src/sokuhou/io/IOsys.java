@@ -108,21 +108,24 @@ public class IOsys extends IO implements LangEventListener{
 			fileItems[3].setText(rb.getString("menu.file.item.export"));
 			fileItems[4].setText(rb.getString("menu.file.item.exit"));
 
-			editItems[0].setText(rb.getString("menu.edit.item.addreadlater"));
-			editItems[1].setText(rb.getString("menu.edit.item.addbookmark"));
+			editItems[0].setText(rb.getString("menu.edit.item.addreadlater"));// 編集	-> あとで読む追加
+			editItems[1].setText(rb.getString("menu.edit.item.removereadlater"));// 	-> あとで読む削除
+			editItems[2].setText(rb.getString("menu.edit.item.addbookmark"));// 		-> マイリスト追加
+			editItems[3].setText(rb.getString("menu.edit.item.removebookmark"));// 		-> マイリスト削除
 
 			settingItems[0].setText(rb.getString("menu.settings.item.addremovekeywords"));
 
 			checkItems[0].setText(rb.getString("menu.info.item.want"));
 			checkItems[1].setText(rb.getString("menu.info.item.notwant"));
 
-			accountItems[0].setText(rb.getString("menu.account.item.name"));
-			accountItems[1].setText(rb.getString("menu.account.item.email"));
-			accountItems[2].setText(rb.getString("menu.account.item.password"));
-			accountItems[3].setText(rb.getString("menu.account.item.otp.regist"));
-			accountItems[4].setText(rb.getString("menu.account.item.birthday"));
-			accountItems[5].setText(rb.getString("menu.account.item.signout"));
-			accountItems[6].setText(rb.getString("menu.account.item.delete"));
+			accountItems[0].setText(rb.getString("menu.account.item.name"));// アカウント管理	-> 名前変更
+			accountItems[1].setText(rb.getString("menu.account.item.email"));// 				-> メールアドレス変更
+			accountItems[2].setText(rb.getString("menu.account.item.password"));// 				-> パスワード変更
+			accountItems[3].setText(rb.getString("menu.account.item.otp.regist"));// 			-> ワンタイムパスワード登録
+			accountItems[4].setText(rb.getString("menu.account.item.otp.delete"));// 			-> ワンタイムパスワード削除
+			accountItems[5].setText(rb.getString("menu.account.item.birthday"));// 				-> 誕生日変更
+			accountItems[6].setText(rb.getString("menu.account.item.signout"));// 				-> ログアウト
+			accountItems[7].setText(rb.getString("menu.account.item.delete"));// 				-> アカウント削除
 
 			wMenu[0].setText(rb.getString("menu.file"));
 			wMenu[1].setText(rb.getString("menu.edit"));
@@ -133,6 +136,7 @@ public class IOsys extends IO implements LangEventListener{
 			menu.langItems[0].setText(rb.getString("lang.auto"));
 
 			menu.helpMenu.setText(rb.getString("menu.help"));// ヘルプ
+			menu.version.setText(rb.getString("menu.help.version") + "(V)");// バージョン
 		}
 		if(evt.getSource() == qr){
 			qr.setTitle(rb.getString("qr.title"));

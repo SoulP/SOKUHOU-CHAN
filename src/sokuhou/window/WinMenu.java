@@ -7,14 +7,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
@@ -28,11 +32,12 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 	// インスタンス変数
 	volatile ResourceBundle rb;
 	EventListenerList evList;
+	Properties pro = new Properties();
 
-	public JMenu[] wMenu = new JMenu[4];
+	public JMenu[] wMenu;
 	public JMenu helpMenu, info, account, optLang;
 	public JMenuItem[] fileItems, editItems, settingItems, accountItems;
-	public JMenuItem up, down;
+	public JMenuItem up, down, version;
 	public JCheckBoxMenuItem[] checkItems;
 	public JCheckBoxMenuItem[] langItems;
 	public final String LANG = "lang";
@@ -60,17 +65,18 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		langMax = 10;
 		langMax += langMin;
 
-
+		wMenu = new JMenu[4];
 		fileItems = new JMenuItem[5];
-		editItems = new JMenuItem[2];
+		editItems = new JMenuItem[4];
 		settingItems = new JMenuItem[1];
 		checkItems = new JCheckBoxMenuItem[2];
-		accountItems = new JMenuItem[7];
+		accountItems = new JMenuItem[8];
 		langItems = new JCheckBoxMenuItem[STR_LANG.length];
 		info = new JMenu();
 		account = new JMenu();
 		optLang = new JMenu();
 		helpMenu = new JMenu();
+		version = new JMenuItem();
 
 		up = new JMenuItem();
 		down = new JMenuItem();
@@ -126,6 +132,7 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		for(JCheckBoxMenuItem item : checkItems) item.addActionListener(this);
 		up.addActionListener(this);
 		down.addActionListener(this);
+		version.addActionListener(this);
 
 		wMenu[0].add(fileItems[0]);
 		wMenu[0].add(fileItems[1]);
@@ -157,6 +164,8 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		wMenu[3].addSeparator();
 		wMenu[3].add(accountItems[6]);
 
+		helpMenu.add(version);
+
 		mode = 0;
 
 		fileItems[0].setText(rb.getString("menu.file.item.save"));// ファイル	-> 上書き保存
@@ -166,7 +175,9 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		fileItems[4].setText(rb.getString("menu.file.item.exit"));// 			-> 終了
 
 		editItems[0].setText(rb.getString("menu.edit.item.addreadlater"));// 編集	-> あとで読む追加
-		editItems[1].setText(rb.getString("menu.edit.item.addbookmark"));// 		-> マイリスト追加
+		editItems[1].setText(rb.getString("menu.edit.item.removereadlater"));// 	-> あとで読む削除
+		editItems[2].setText(rb.getString("menu.edit.item.addbookmark"));// 		-> マイリスト追加
+		editItems[3].setText(rb.getString("menu.edit.item.removebookmark"));// 		-> マイリスト削除
 
 		settingItems[0].setText(rb.getString("menu.settings.item.addremovekeywords"));// 設定	-> 単語追加
 
@@ -175,11 +186,12 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 
 		accountItems[0].setText(rb.getString("menu.account.item.name"));// アカウント管理	-> 名前変更
 		accountItems[1].setText(rb.getString("menu.account.item.email"));// 				-> メールアドレス変更
-		accountItems[2].setText(rb.getString("menu.account.item.password"));// 			-> パスワード変更
+		accountItems[2].setText(rb.getString("menu.account.item.password"));// 				-> パスワード変更
 		accountItems[3].setText(rb.getString("menu.account.item.otp.regist"));// 			-> ワンタイムパスワード登録
-		accountItems[4].setText(rb.getString("menu.account.item.birthday"));// 			-> 誕生日変更
-		accountItems[5].setText(rb.getString("menu.account.item.signout"));// 				-> ログアウト
-		accountItems[6].setText(rb.getString("menu.account.item.delete"));// 				-> アカウント削除
+		accountItems[4].setText(rb.getString("menu.account.item.otp.delete"));// 			-> ワンタイムパスワード削除
+		accountItems[5].setText(rb.getString("menu.account.item.birthday"));// 				-> 誕生日変更
+		accountItems[6].setText(rb.getString("menu.account.item.signout"));// 				-> ログアウト
+		accountItems[7].setText(rb.getString("menu.account.item.delete"));// 				-> アカウント削除
 
 		wMenu[0].setText(rb.getString("menu.file"));// ファイル
 		wMenu[1].setText(rb.getString("menu.edit"));// 編集
@@ -204,9 +216,10 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		}
 
 		helpMenu.setText(rb.getString("menu.help"));// ヘルプ
+		version.setText(rb.getString("menu.help.version") + "(V)");// バージョン
 
-		up.setText(rb.getString("menu.up"));
-		down.setText(rb.getString("menu.down"));
+		up.setText(rb.getString("menu.up"));// ▲
+		down.setText(rb.getString("menu.down"));// ▼
 
 		// ニーモニック割当
 		wMenu[0].setMnemonic(KeyEvent.VK_F);
@@ -219,6 +232,25 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
 		fileItems[2].setMnemonic(KeyEvent.VK_I);
 		fileItems[3].setMnemonic(KeyEvent.VK_O);
 		fileItems[4].setMnemonic(KeyEvent.VK_X);
+		editItems[0].setMnemonic(KeyEvent.VK_R);
+		editItems[1].setMnemonic(KeyEvent.VK_R);
+		editItems[2].setMnemonic(KeyEvent.VK_B);
+		editItems[3].setMnemonic(KeyEvent.VK_B);
+		settingItems[0].setMnemonic(KeyEvent.VK_K);
+		info.setMnemonic(KeyEvent.VK_I);
+		checkItems[0].setMnemonic(KeyEvent.VK_W);
+		checkItems[1].setMnemonic(KeyEvent.VK_N);
+		accountItems[0].setMnemonic(KeyEvent.VK_N);
+		accountItems[1].setMnemonic(KeyEvent.VK_E);
+		accountItems[2].setMnemonic(KeyEvent.VK_P);
+		accountItems[3].setMnemonic(KeyEvent.VK_O);
+		accountItems[4].setMnemonic(KeyEvent.VK_O);
+		accountItems[5].setMnemonic(KeyEvent.VK_B);
+		accountItems[6].setMnemonic(KeyEvent.VK_S);
+		accountItems[7].setMnemonic(KeyEvent.VK_D);
+		optLang.setMnemonic(KeyEvent.VK_L);
+		langItems[0].setMnemonic(KeyEvent.VK_A);
+		version.setMnemonic(KeyEvent.VK_V);
 
 		// 言語表示数制限(画面外の表示対策)
 		for(int i = 1; i < langItems.length; i++) langItems[i].setVisible(false);
@@ -276,6 +308,18 @@ public class WinMenu extends JMenuBar implements ActionListener, ItemListener, R
             c = SwingUtilities.getAncestorOfClass(JPopupMenu.class, (Component) optLang);
             if (c instanceof JPopupMenu) ((JPopupMenu) c).setVisible(true);
             goDOWN();
+		}
+		if(e.getSource() == version){
+			try{
+				InputStream input = new FileInputStream("lib/resource/info.properties");
+				pro.load(input);
+				input.close();
+				String ver = rb.getString("menu.help.version");
+				JOptionPane.showMessageDialog(null, ver + ": " + pro.getProperty("version"), ver,JOptionPane.INFORMATION_MESSAGE);
+			}catch (Exception e1){
+				System.out.println(e1);
+				e1.printStackTrace();
+			}
 		}
 		for(int i = 0; i < fileItems.length -1; i++){
 			if(e.getSource() == fileItems[i]){

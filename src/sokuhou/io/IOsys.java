@@ -102,21 +102,21 @@ public class IOsys extends IO implements LangEventListener{
 			JMenu[] wMenu = menu.wMenu;
 			JCheckBoxMenuItem[] checkItems = menu.checkItems;
 
-			fileItems[0].setText(rb.getString("menu.file.item.save"));
-			fileItems[1].setText(rb.getString("menu.file.item.saveas"));
-			fileItems[2].setText(rb.getString("menu.file.item.import"));
-			fileItems[3].setText(rb.getString("menu.file.item.export"));
-			fileItems[4].setText(rb.getString("menu.file.item.exit"));
+			fileItems[0].setText(rb.getString("menu.file.item.save"));// 保存
+			fileItems[1].setText(rb.getString("menu.file.item.saveas"));// 名前を付けて保存
+			fileItems[2].setText(rb.getString("menu.file.item.import"));// インポート
+			fileItems[3].setText(rb.getString("menu.file.item.export"));// エクスポート
+			fileItems[4].setText(rb.getString("menu.file.item.exit"));// 終了
 
 			editItems[0].setText(rb.getString("menu.edit.item.addreadlater"));// 編集	-> あとで読む追加
 			editItems[1].setText(rb.getString("menu.edit.item.removereadlater"));// 	-> あとで読む削除
 			editItems[2].setText(rb.getString("menu.edit.item.addbookmark"));// 		-> マイリスト追加
 			editItems[3].setText(rb.getString("menu.edit.item.removebookmark"));// 		-> マイリスト削除
 
-			settingItems[0].setText(rb.getString("menu.settings.item.addremovekeywords"));
+			settingItems[0].setText(rb.getString("menu.settings.item.addremovekeywords"));// 設定 -> 単語追加削除
 
-			checkItems[0].setText(rb.getString("menu.info.item.want"));
-			checkItems[1].setText(rb.getString("menu.info.item.notwant"));
+			checkItems[0].setText(rb.getString("menu.info.item.want"));// 		設定 -> 情報 -> 欲しい
+			checkItems[1].setText(rb.getString("menu.info.item.notwant"));// 	設定 -> 情報 -> 欲しくない
 
 			accountItems[0].setText(rb.getString("menu.account.item.name"));// アカウント管理	-> 名前変更
 			accountItems[1].setText(rb.getString("menu.account.item.email"));// 				-> メールアドレス変更
@@ -127,24 +127,24 @@ public class IOsys extends IO implements LangEventListener{
 			accountItems[6].setText(rb.getString("menu.account.item.signout"));// 				-> ログアウト
 			accountItems[7].setText(rb.getString("menu.account.item.delete"));// 				-> アカウント削除
 
-			wMenu[0].setText(rb.getString("menu.file"));
-			wMenu[1].setText(rb.getString("menu.edit"));
-			wMenu[2].setText(rb.getString("menu.settings"));
-			wMenu[3].setText(rb.getString("menu.account"));
-			menu.info.setText(rb.getString("menu.info"));
-			menu.optLang.setText(rb.getString("lang"));
-			menu.langItems[0].setText(rb.getString("lang.auto"));
+			wMenu[0].setText(rb.getString("menu.file"));// ファイル
+			wMenu[1].setText(rb.getString("menu.edit"));// 編集
+			wMenu[2].setText(rb.getString("menu.settings"));// 設定
+			wMenu[3].setText(rb.getString("menu.account"));// アカウント
+			menu.info.setText(rb.getString("menu.info"));// 情報
+			menu.optLang.setText(rb.getString("lang"));// 言語
+			menu.langItems[0].setText(rb.getString("lang.auto"));// 言語 -> 自動
 
 			menu.helpMenu.setText(rb.getString("menu.help"));// ヘルプ
 			menu.version.setText(rb.getString("menu.help.version") + "(V)");// バージョン
 		}
 		if(evt.getSource() == qr){
-			qr.setTitle(rb.getString("qr.title"));
-			qr.label.setText(rb.getString("qr.authcode"));
-			qr.button.setText(rb.getString("qr.confirm"));
-			qr.str01 = rb.getString("qr.text01");
-			qr.str02 = rb.getString("qr.text02");
-			qr.text.setText(qr.str01);
+			qr.setTitle(rb.getString("qr.title"));// タイトル
+			qr.label.setText(rb.getString("qr.authcode"));// 認証コード
+			qr.button.setText(rb.getString("qr.confirm"));// 確認
+			qr.str01 = rb.getString("qr.text01");// 文字列
+			qr.str02 = rb.getString("qr.text02");// 文字列
+			qr.text.setText(qr.str01);// 文字列設定
 		}
 	}
 

@@ -85,6 +85,11 @@ public class AccountRegister extends JSocket{
 			if(wdt.isAlive()) wdt.join();
 			send(getAllBytes());// 構築したバイト列を送信する
 
+			while(!recvBoolean());
+			wdt.start();
+
+			enc = new JEncrypt(cipher.AES, getSecretKey());
+			//
 
 		} catch (Exception e) {
 			// エラー

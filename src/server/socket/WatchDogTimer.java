@@ -80,11 +80,11 @@ public class WatchDogTimer extends JSocket{
 				if(nowTime >= afterTime){// 現在の時間が予定以上過ぎた場合
 					afterTime = nowTime;// 現在の時間をコピー
 					afterTime += interval;// 間隔を足す
-					getDOS().writeBoolean(false);// クライアントにfalse送信
+					sendBoolean(false);// クライアントにfalse送信
 				}
 				nowTime = (int) System.currentTimeMillis();// 現在の時間を取得
 			}while(rtm);// whileループ後判定 時間監視有効の間
-			getDOS().writeBoolean(true);// クライアントにtrue送信
+			sendBoolean(true);// クライアントにtrue送信
 		}catch (Exception e){
 			// エラー表示
 			System.out.println(e);// エラー内容の表示

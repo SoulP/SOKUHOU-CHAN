@@ -53,18 +53,22 @@ public class AccountRegister extends JSocket{
 			dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
 			publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
-			// サーバーへのアクセス可否確認 true = OK, false = NG
-			if(recvBoolean()){
+			// サーバー応答確認
+			sendBoolean(true);
+			while(!recvBoolean()){}
+				// サーバーへのアクセス可否確認 true = OK, false = NG
 				if(!recvBoolean()){// falseの場合、終了
 					if(!getSocket().isClosed()) close();// 接続が閉じられていない場合は、閉じる
+					rb = sokuhou.MainSYS.lang.getResBundle();
+					JOptionPane.showMessageDialog(null, rb.getString("error.connect.failed"), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 // 03. CLがSVに接続を要求する(接続情報の接続番号は0000)
-					// アカウントの登録を要求する
-					createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-					setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
-					buildBytes();// 送信用バイト列に構築する
-					send(getAllBytes());// 構築したバイト列を送信する
+				// アカウントの登録を要求する
+				createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+				setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
+				buildBytes();// 送信用バイト列に構築する
+				send(getAllBytes());// 構築したバイト列を送信する
 
 // 05. CLが応じられた結果を確認する
 // 06. TRUEの場合は、CLの公開鍵をSVに送る(接続情報の接続番号は0000)
@@ -178,10 +182,6 @@ public class AccountRegister extends JSocket{
 				// 受信
 				while(!recvBoolean()){}
 				check = recvBoolean();
-			}else{
-				rb = sokuhou.MainSYS.lang.getResBundle();
-				JOptionPane.showMessageDialog(null, rb.getString("error.connect.failed"), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
-			}
 		} catch (Exception e){
 			// エラーが起きた際の処理
 			System.out.println(e);// エラー内容を出力する

@@ -20,6 +20,8 @@ public class Service extends JSocket{
 
 	public void run(){
 		try{
+			if(!recvBoolean()) return;
+
 			// カレンダー
 			JCalendar calendar = new JCalendar();
 			calendar.start();

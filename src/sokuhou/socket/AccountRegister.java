@@ -64,7 +64,7 @@ public class AccountRegister extends JSocket{
 // 06. TRUEの場合は、CLの公開鍵をSVに送る(接続情報の接続番号は0000)
 // -06. FALSEの場合は、CLは閉じる
 			// サーバが応じるかどうか確認する true = OK, false = NG
-			start:if(recvBoolean()){
+			if(recvBoolean()){
 				if(!recvBoolean()){// falseの場合、終了
 					if(!getSocket().isClosed()) close();// 接続が閉じられていない場合は、閉じる
 					return;
@@ -180,12 +180,8 @@ public class AccountRegister extends JSocket{
 				while(!recvBoolean()){}
 				check = recvBoolean();
 			}else{
-				if((++counter) >= 10){
-					rb = sokuhou.MainSYS.lang.getResBundle();
-					JOptionPane.showMessageDialog(null, rb.getString("error.connect.failed"), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
-				}else{
-					break start;
-				}
+				rb = sokuhou.MainSYS.lang.getResBundle();
+				JOptionPane.showMessageDialog(null, rb.getString("error.connect.failed"), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
 			}
 		} catch (Exception e){
 			// エラーが起きた際の処理

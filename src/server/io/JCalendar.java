@@ -162,4 +162,9 @@ public class JCalendar extends Thread{
 		return second;
 	}
 
+	// 安全停止
+	public synchronized void stopSafety(){
+		bool = false;
+	}
+
 }

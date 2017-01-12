@@ -7,6 +7,7 @@ public class WatchDogTimer extends JSocket{
 	private int afterTime;// 予測経過時間
 	private int nowTime;// 現在の時間
 	private boolean rtm;// 時間監視
+	private boolean bool;// 安全停止
 
 	// コンストラクタ
 	public WatchDogTimer(){
@@ -75,6 +76,7 @@ public class WatchDogTimer extends JSocket{
 
 		try{
 			do{
+				if(!bool) return;// 安全停止
 				if(nowTime >= afterTime){// 現在の時間が予定以上過ぎた場合
 					afterTime = nowTime;// 現在の時間をコピー
 					afterTime += interval;// 間隔を足す
@@ -122,6 +124,11 @@ public class WatchDogTimer extends JSocket{
 	// 送信可能な状態をクライアントに知らせる
 	public synchronized void success(){
 		rtm = false;// 時間監視をfalseに設定
+	}
+
+	// 安全停止
+	public synchronized void stopSafety(){
+		bool = false;
 	}
 
 }

@@ -70,6 +70,15 @@ public class AccountRegister extends JSocket{
 				buildBytes();// 送信用バイト列に構築する
 				send(getAllBytes());// 構築したバイト列を送信する
 
+				while(!recvBoolean());
+				// サーバーへのアクセス可否確認 true = OK, false = NG
+				if(!recvBoolean()){// falseの場合、終了
+					if(!getSocket().isClosed()) close();// 接続が閉じられていない場合は、閉じる
+					rb = sokuhou.MainSYS.lang.getResBundle();
+					JOptionPane.showMessageDialog(null, rb.getString("error.connect.failed"), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
 // 05. CLが応じられた結果を確認する
 // 06. TRUEの場合は、CLの公開鍵をSVに送る(接続情報の接続番号は0000)
 // -06. FALSEの場合は、CLは閉じる

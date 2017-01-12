@@ -48,7 +48,7 @@ public class Service extends JSocket{
 
 			try{
 				wdt.success();
-				wdt.join();
+				if(wdt.isAlive()) wdt.join();
 				if(!check){
 					// クライアントにfalse送信
 					sendBoolean(false);

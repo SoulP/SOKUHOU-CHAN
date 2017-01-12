@@ -141,25 +141,45 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 受信 バイト列
-	protected synchronized int recv(byte[] bytes) throws IOException{
-		return dis.read(bytes);
+	protected synchronized byte[] recv() throws IOException{
+		return recv(bufferData);
 	}
 
 	// 受信 バイト列
-	protected synchronized byte[] recv(String connectionNO) throws Exception{
-		int buffLength = recv(bufferData);
+	protected synchronized byte[] recv(byte[] bytes) throws IOException{
+		int buffLength = dis.read(bytes);
 		rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
 		clearBytes(rData);// バイト列を初期化する
 		for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
 		clearBytes(bufferData);// バイト列を初期化する
-		info = getInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
-		// 不正な接続番号の場合は、エラーとして発生させる
-		if(!info.get(0).equals(connectionNO)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+		info = outputInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
 		// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
-		if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-		if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-		if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-		if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-1] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-2] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-3] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-4] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
+
+		// バイト列からデータを取る
+		byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
+		for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 接続情報と終了コードを含めずに、データだけコピーする
+		return buffData;
+	}
+
+	// 受信 バイト列
+	protected synchronized byte[] recv(String connectionNO) throws IOException{
+		int buffLength = dis.read(bufferData);
+		rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
+		clearBytes(rData);// バイト列を初期化する
+		for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
+		clearBytes(bufferData);// バイト列を初期化する
+		info = outputInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
+		// 不正な接続番号の場合は、エラーとして発生させる
+		if(!info.get(0).equals(connectionNO)) throw new IOException("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+		// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
+		if(rData[rData.length-1] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-2] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-3] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-4] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
 
 		// バイト列からデータを取る
 		byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
@@ -262,7 +282,7 @@ public abstract class JSocket extends Thread{
 		return bData;
 	}
 
-	// 接続情報のバイト列生成 (接続番号 + 接続順 + 操作 + 種類)
+	// 接続情報のバイト列生成 (接続番号 + 操作 + 種類)
 	public synchronized void createInfoBytes(String connection_no, ctrl c, type t){
 		byte[] buff = new byte[iData.length];
 		clearBytes(buff);
@@ -299,8 +319,18 @@ public abstract class JSocket extends Thread{
 		}
 	}
 
+	// 接続情報のリスト 入力
+	protected synchronized void setInfo(List<String> info){
+		this.info = info;
+	}
+
 	// 接続情報のリスト 出力
-	public synchronized List<String> getInfo(byte[] bytes){
+	protected synchronized List<String> getInfo(){
+		return info;
+	}
+
+	// 接続情報のリスト 出力
+	public synchronized List<String> outputInfo(byte[] bytes){
 		// 接続情報のバイト列からList<String>に変換
 		if(bytes.length < 4) return null;
 		List<String> str = new ArrayList<String>();
@@ -499,6 +529,21 @@ public abstract class JSocket extends Thread{
 		setEmail(null);// null値で初期化
 		setBirthDay(null);// null値で初期化
 		setOTP(null);// null値で初期化
+	}
+
+	// クライアントのIPアドレス 出力
+	protected synchronized String getClientIPaddress(){
+		return socket.getInetAddress().getHostAddress();
+	}
+
+	// クライアントのホスト名 出力
+	protected synchronized String getClientHostName(){
+		return socket.getInetAddress().getHostName();
+	}
+
+	// クライアントのポート番号 出力
+	protected synchronized int getClientPort(){
+		return socket.getPort();
 	}
 
 	// 登録処理確認 true = 完了, false = 失敗

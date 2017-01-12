@@ -55,7 +55,7 @@ public class AccountRegister extends JSocket{
 
 			// サーバー応答確認
 			sendBoolean(true);
-			while(!recvBoolean()){}
+			while(!recvBoolean());
 				// サーバーへのアクセス可否確認 true = OK, false = NG
 				if(!recvBoolean()){// falseの場合、終了
 					if(!getSocket().isClosed()) close();// 接続が閉じられていない場合は、閉じる
@@ -82,7 +82,7 @@ public class AccountRegister extends JSocket{
 
 // 10. CLがSVから共通鍵を受け取り、CLの秘密鍵で復号化する
 				// 受信
-				while(!recvBoolean()){}
+				while(!recvBoolean());
 				buff = recv("0000");
 
 				// 復号化
@@ -95,7 +95,7 @@ public class AccountRegister extends JSocket{
 
 // 15. CLがSVから暗号化されたデータ情報を受け取り、CLの秘密鍵で復号化する
 				// 受信
-				while(!recvBoolean()){}
+				while(!recvBoolean());
 				buff = recv("0000");
 
 				// 復号化
@@ -180,7 +180,7 @@ public class AccountRegister extends JSocket{
 
 // FIN. 結果待ち
 				// 受信
-				while(!recvBoolean()){}
+				while(!recvBoolean());
 				check = recvBoolean();
 		} catch (Exception e){
 			// エラーが起きた際の処理

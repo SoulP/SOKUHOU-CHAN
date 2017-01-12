@@ -6,6 +6,7 @@ public class JCalendar extends Thread{
 	// インスタンス変数
 	// 言語
 	private int lang;
+	private boolean bool;
 
 	// 曜日
 	final static String[][] strDay = {
@@ -69,17 +70,20 @@ public class JCalendar extends Thread{
 	public JCalendar(){
 		year = month = date = day = hour = minute = second = 0;// 0の値で初期化
 		lang = 0;// 0の値で初期化、デフォルトを日本語にする
+		bool = true;
 	}
 
 	// コンストラクタ
 	public JCalendar(int lang){
 		year = month = date = day = hour = minute = second = 0;// 0の値で初期化
 		this.lang = lang;// 値をコピー
+		bool = true;
 	}
 
 	// スレッド
 	public void run(){
-		while(true){
+		bool = true;
+		while(bool){
 			try{
 				// カレンダー
 				Calendar calendar = Calendar.getInstance();// インスタンス取得
@@ -88,12 +92,13 @@ public class JCalendar extends Thread{
 				date   = calendar.get(Calendar.DATE);// 日の値取得
 				day    = calendar.get(Calendar.DAY_OF_WEEK) - 1;// 曜日の値取得
 				day    = (day == 0)? 7 : day - 1;// 曜日の値変更
-				hour   = calendar.get(Calendar.HOUR);// 時の値取得
+				hour   = calendar.get(Calendar.HOUR_OF_DAY);// 時の値取得
 				minute = calendar.get(Calendar.MINUTE);// 分の値取得
 				second = calendar.get(Calendar.SECOND);// 秒の値取得
 			}catch (Exception e){
 				// エラー起きた場合
 				year = month = date = day = hour = minute = second = 0;// 0の値で初期化
+				bool = false;
 				System.out.println(e);// エラー表示
 				e.printStackTrace();// エラー原因追跡表示
 			}

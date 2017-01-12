@@ -2,6 +2,8 @@ package server.socket;
 
 import java.net.Socket;
 
+import server.io.JCalendar;
+
 public class Service extends Thread{
 	private final Socket socket;
 	public String clientIP;// クライアントのIPアドレス
@@ -18,13 +20,14 @@ public class Service extends Thread{
 
 	public void run(){
 		try{
+			JCalendar calendar = new JCalendar();
+			calendar.start();
 			WatchDogTimer wdt = new WatchDogTimer(socket);
 			wdt.start();
-			
 			clientIP = socket.getInetAddress().getHostAddress();// 送信元のIPアドレス取得
 			clientHostName = socket.getInetAddress().getHostName();// 送信元のホスト名取得
 			clientPort = socket.getPort();// 送信元のポート番号取得
-			
+
 
 		}catch (Exception e){
 			System.out.println(e);

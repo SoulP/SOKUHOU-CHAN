@@ -53,23 +53,22 @@ public class AccountRegister extends JSocket{
 			dec = new JDecrypt(cipher.RSA, enc.getPrivateKey());// 復号化
 			publicKEY = JCipher.publicKey2bytes(enc.getPublicKey()); // 公開鍵のバイト列
 
-// 03. CLがSVに接続を要求する(接続情報の接続番号は0000)
-			// アカウントの登録を要求する
-			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
-			buildBytes();// 送信用バイト列に構築する
-			send(getAllBytes());// 構築したバイト列を送信する
-
-// 05. CLが応じられた結果を確認する
-// 06. TRUEの場合は、CLの公開鍵をSVに送る(接続情報の接続番号は0000)
-// -06. FALSEの場合は、CLは閉じる
-			// サーバが応じるかどうか確認する true = OK, false = NG
+			// サーバーへのアクセス可否確認 true = OK, false = NG
 			if(recvBoolean()){
 				if(!recvBoolean()){// falseの場合、終了
 					if(!getSocket().isClosed()) close();// 接続が閉じられていない場合は、閉じる
 					return;
 				}
+// 03. CLがSVに接続を要求する(接続情報の接続番号は0000)
+					// アカウントの登録を要求する
+					createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+					setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
+					buildBytes();// 送信用バイト列に構築する
+					send(getAllBytes());// 構築したバイト列を送信する
 
+// 05. CLが応じられた結果を確認する
+// 06. TRUEの場合は、CLの公開鍵をSVに送る(接続情報の接続番号は0000)
+// -06. FALSEの場合は、CLは閉じる
 				// クライアント(自分)の公開鍵を送信
 				createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
 				buildBytes(publicKEY);// 公開鍵のバイト列を使って、送信用バイト列に構築する

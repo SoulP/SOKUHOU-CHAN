@@ -63,7 +63,7 @@ public abstract class JSocket extends Thread{
 // 通信
 
 	// ソケット 生成
-	protected void createSocket(){
+	protected synchronized void createSocket(){
 		try {
 			socket = new Socket(host, port);// 接続先へのソケットを作成
 		} catch (Exception e){
@@ -80,100 +80,120 @@ public abstract class JSocket extends Thread{
 		}
 	}
 	// ソケット 出力
-	public Socket getSocket(){
+	public synchronized Socket getSocket(){
 		return socket;
 	}
 
 	// 送信用ストリーム 入力
-	protected void setDOS(OutputStream os){
+	protected synchronized void setDOS(OutputStream os){
 		dos = new DataOutputStream(os);
 	}
 
 	// 送信用ストリーム 出力
-	protected DataOutputStream getDOS(){
+	protected synchronized DataOutputStream getDOS(){
 		return dos;
 	}
 
 	// 受信用ストリーム 入力
-	protected void setDIS(InputStream is){
+	protected synchronized void setDIS(InputStream is){
 		dis = new DataInputStream(is);
 	}
 
 	// 送信用ストリーム 出力
-	protected DataInputStream getDIS(){
+	protected synchronized DataInputStream getDIS(){
 		return dis;
 	}
 
 	// 送信 バイト列
-	protected void send(byte[] bytes) throws IOException{
+	protected synchronized void send(byte[] bytes) throws IOException{
 		dos.write(bytes);
 	}
 
 	// 送信 byte型
-	protected void sendByte(byte b) throws IOException{
+	protected synchronized void sendByte(byte b) throws IOException{
 		dos.writeByte((int)(b & 0xFF));
 	}
 
 	// 送信 short型
-	protected void sendShort(short s) throws IOException{
+	protected synchronized void sendShort(short s) throws IOException{
 		dos.writeShort(s);
 	}
 
 	// 送信 int型
-	protected void sendInt(int i) throws IOException{
+	protected synchronized void sendInt(int i) throws IOException{
 		dos.writeInt(i);
 	}
 
 	// 送信 long型
-	protected void sendLong(long l) throws IOException{
+	protected synchronized void sendLong(long l) throws IOException{
 		dos.writeLong(l);
 	}
 
 	// 送信 float型
-	protected void sendFloat(float f) throws IOException{
+	protected synchronized void sendFloat(float f) throws IOException{
 		dos.writeFloat(f);
 	}
 
 	// 送信 double型
-	protected void sendDouble(double d) throws IOException{
+	protected synchronized void sendDouble(double d) throws IOException{
 		dos.writeDouble(d);
 	}
 
 	// 送信 boolean型
-	protected void sendBoolean (boolean bool) throws IOException{
+	protected synchronized void sendBoolean (boolean bool) throws IOException{
 		dos.writeBoolean(bool);
 	}
 
 	// 送信 char型
-	protected void sendChar(char c) throws IOException{
+	protected synchronized void sendChar(char c) throws IOException{
 		dos.writeChar(c);
 	}
 
 	// 送信 文字列(UTF-8)
-	protected void sendString(String str) throws IOException{
+	protected synchronized void sendString(String str) throws IOException{
 		dos.writeUTF(str);
 	}
 
 	// 受信 バイト列
-	protected int recv(byte[] bytes) throws IOException{
-		return dis.read(bytes);
+	protected synchronized byte[] recv() throws IOException{
+		return recv(bufferData);
 	}
 
 	// 受信 バイト列
-	protected byte[] recv(String connectionNO) throws Exception{
-		int buffLength = recv(bufferData);
+	protected synchronized byte[] recv(byte[] bytes) throws IOException{
+		int buffLength = dis.read(bytes);
 		rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
 		clearBytes(rData);// バイト列を初期化する
 		for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
 		clearBytes(bufferData);// バイト列を初期化する
-		info = getInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
-		// 不正な接続番号の場合は、エラーとして発生させる
-		if(!info.get(0).equals(connectionNO)) throw new Exception("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+		info = outputInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
 		// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
-		if(rData[rData.length-1] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-		if(rData[rData.length-2] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
-		if(rData[rData.length-3] != 0xFF) throw new Exception("ERROR: data bytes can't find end-code ");
-		if(rData[rData.length-4] != 0x00) throw new Exception("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-1] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-2] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-3] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-4] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
+
+		// バイト列からデータを取る
+		byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
+		for(int i = 0; i < buffData.length; i++) buffData[i] = rData[i + 3];// 接続情報と終了コードを含めずに、データだけコピーする
+		return buffData;
+	}
+
+	// 受信 バイト列
+	protected synchronized byte[] recv(String connectionNO) throws IOException{
+		int buffLength = dis.read(bufferData);
+		rData = new byte[buffLength];// 受信したバイト列をbufferDataに保存し、受信したバイト列の配列数を使ってrDataに値なしのバイト列を作成する
+		clearBytes(rData);// バイト列を初期化する
+		for(int i = 0; i < rData.length; i++)rData[i] = bufferData[i];// 全ての情報とデータをコピーする
+		clearBytes(bufferData);// バイト列を初期化する
+		info = outputInfo(rData);// 接続情報用の文字列のリストを作成し、接続情報のバイト列から各情報をリストに追加する
+		// 不正な接続番号の場合は、エラーとして発生させる
+		if(!info.get(0).equals(connectionNO)) throw new IOException("ERROR: conncetion_no or nextConnection value can't use it. need reconnect");
+		// データ情報の最後の部分に終了コードが無い、もしくは違う値である場合は、エラーとして発生させる
+		if(rData[rData.length-1] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-2] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-3] != 0xFF) throw new IOException("ERROR: data bytes can't find end-code ");
+		if(rData[rData.length-4] != 0x00) throw new IOException("ERROR: data bytes can't find end-code ");
 
 		// バイト列からデータを取る
 		byte[] buffData = new byte[rData.length-7];// データ用バイト列を作成する
@@ -182,62 +202,62 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 受信 byte型
-	protected byte recvByte() throws IOException{
+	protected synchronized byte recvByte() throws IOException{
 		return dis.readByte();
 	}
 
 	// 受信 short型
-	protected short recvShort() throws IOException{
+	protected synchronized short recvShort() throws IOException{
 		return dis.readShort();
 	}
 
 	// 受信 int型
-	protected int recvInt() throws IOException{
+	protected synchronized int recvInt() throws IOException{
 		return dis.readInt();
 	}
 
 	// 受信 long型
-	protected long recvLong() throws IOException{
+	protected synchronized long recvLong() throws IOException{
 		return dis.readLong();
 	}
 
 	// 受信 float型
-	protected float recvFloat() throws IOException{
+	protected synchronized float recvFloat() throws IOException{
 		return dis.readFloat();
 	}
 
 	// 受信 double型
-	protected double recvDouble() throws IOException{
+	protected synchronized double recvDouble() throws IOException{
 		return dis.readDouble();
 	}
 
 	// 受信 boolean型
-	protected boolean recvBoolean() throws IOException{
+	protected synchronized boolean recvBoolean() throws IOException{
 		return dis.readBoolean();
 	}
 
 	// 受信 char型
-	protected char recvChar() throws IOException{
+	protected synchronized char recvChar() throws IOException{
 		return dis.readChar();
 	}
 
 	// 受信 文字列(UTF-8)
-	protected String recvString() throws IOException{
+	protected synchronized String recvString() throws IOException{
 		return dis.readUTF();
 	}
 
 	// ソケット 入力
-	public void setSocket(Socket socket){
+	public synchronized void setSocket(Socket socket){
 		this.socket = socket;
 	}
 
 	// バイト列初期化
-	public void clearBytes(byte[] bytes){
+	public synchronized void clearBytes(byte[] bytes){
 		for(int i = 0; i < bytes.length; i++) bytes[i] = 0;// 全ての配列に0で埋める
 	}
 
 	// バイト列構築 接続情報 + データ情報 + 終了コード(0x00, 0xFF, 0x00, 0xFF)
-	public void buildBytes(){
+	public synchronized void buildBytes(){
 		final int length = iData.length + bData.length;
 		byte[] z = new byte[length];
 		clearBytes(z);
@@ -254,7 +274,7 @@ public abstract class JSocket extends Thread{
 	}
 
 	// バイト列構築 接続情報 + データ情報 + 終了コード(0x00, 0xFF, 0x00, 0xFF)
-	public void buildBytes(byte[] bytes){// bytes = データ情報
+	public synchronized void buildBytes(byte[] bytes){// bytes = データ情報
 		final int length = iData.length + bytes.length;
 		byte[] z = new byte[length];
 		clearBytes(z);
@@ -272,17 +292,17 @@ public abstract class JSocket extends Thread{
 	}
 
 	// データ情報のバイト列 入力
-	public void setDataBytes(byte[] bData){
+	public synchronized void setDataBytes(byte[] bData){
 		this.bData = bData;
 	}
 
 	// データ情報のバイト列 出力
-	public byte[] getDataBytes(){
+	public synchronized byte[] getDataBytes(){
 		return bData;
 	}
 
-	// 接続情報のバイト列生成 (接続番号 + 接続順 + 操作 + 種類)
-	public void createInfoBytes(String connection_no, ctrl c, type t){
+	// 接続情報のバイト列生成 (接続番号 + 操作 + 種類)
+	public synchronized void createInfoBytes(String connection_no, ctrl c, type t){
 		byte[] buff = new byte[iData.length];
 		clearBytes(buff);
 		try{
@@ -318,8 +338,18 @@ public abstract class JSocket extends Thread{
 		}
 	}
 
+	// 接続情報のリスト 入力
+	protected synchronized void setInfo(List<String> info){
+		this.info = info;
+	}
+
 	// 接続情報のリスト 出力
-	public List<String> getInfo(byte[] bytes){
+	protected synchronized List<String> getInfo(){
+		return info;
+	}
+
+	// 接続情報のリスト 出力
+	protected synchronized List<String> outputInfo(byte[] bytes){
 		// 接続情報のバイト列からList<String>に変換
 		if(bytes.length < 4) return null;
 		List<String> str = new ArrayList<String>();
@@ -350,7 +380,7 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 乱数生成 一番上の数字が0が出ない出力
-	public int randomNO(int digits){
+	public synchronized int randomNO(int digits){
 		String buffer = "";// 初期化
 		for(int i = 0; i < digits; i++)buffer += (int)(Math.random() * 10.0);// 桁数で各桁に乱数(0～9)を入れる
 		int x = Integer.parseInt(buffer);// 文字列をint型に変換
@@ -362,40 +392,40 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 構築したバイト列 出力
-	public byte[] getAllBytes(){
+	public synchronized byte[] getAllBytes(){
 		return allData;
 	}
 
 	// 文字列から配列 変換
-	public byte[] str2bytes(String str) throws UnsupportedEncodingException{
+	public synchronized byte[] str2bytes(String str) throws UnsupportedEncodingException{
 		return str.getBytes("UTF-8");// 文字列をバイト列(UTF-8)に変換
 	}
 
 	// バイト列から文字列 変換
-	public String bytes2str(byte[] bytes) throws UnsupportedEncodingException{
+	public synchronized String bytes2str(byte[] bytes) throws UnsupportedEncodingException{
 		return new String(bytes, "UTF-8");// バイト列(UTF-8)を文字列に変換
 	}
 
 
 	// 共通鍵 入力
-	protected void setSecretKey(SecretKey key){
+	protected synchronized void setSecretKey(SecretKey key){
 		this.key = key;
 	}
 
 	// 共通鍵 出力
-	protected SecretKey getSecretKey(){
+	protected synchronized SecretKey getSecretKey(){
 		return key;
 	}
 
 	// 接続 開く
-	protected void open() throws IOException{
+	protected synchronized void open() throws IOException{
 		createSocket();// ソケット生成
 		setDOS(socket.getOutputStream());// 送信用ストリームを設定
 		setDIS(socket.getInputStream());// 受信用ストリームを設定
 	}
 
 	// 接続 閉じる
-	protected void close() throws IOException{
+	protected synchronized void close() throws IOException{
 		dis.close();// 受信用ストリームを閉じる
 		dos.close();// 送信用ストリームを閉じる
 		socket.close();// ソケットを閉じる
@@ -404,12 +434,12 @@ public abstract class JSocket extends Thread{
 // 接続情報
 
 	// 次の接続番号 出力
-	protected int nextConnect(){
+	protected synchronized int nextConnect(){
 		return nextConnect(cKEY, cNO);
 	}
 
 	// 次の接続番号 出力
-	protected int nextConnect(int cKEY, int cNO){
+	protected synchronized int nextConnect(int cKEY, int cNO){
 		// (cNO ^ cKEY) % 10000
 		// (cNO pow cKEY) mod 10000
 		BigInteger bigINT = BigInteger.valueOf(cNO);
@@ -419,100 +449,100 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 次の接続番号 設定
-	protected void setNextConnection(String connectKEY){
+	protected synchronized void setNextConnection(String connectKEY){
 		setConnectionNO(Integer.parseInt(connectKEY.substring(0,4)));// 最初の4桁を接続番号としてcNOに保存する
 		setConnectionKEY(Integer.parseInt(connectKEY.substring(5, 8)));// 次の4桁を接続番号用の乱数としてcKEYに保存する
 	}
 
 	// 接続番号 入力
-	protected void setConnectionNO(int cNO){
+	protected synchronized void setConnectionNO(int cNO){
 		this.cNO = cNO;
 	}
 
 	// 接続番号 出力
-	protected int getConnectionNO(){
+	protected synchronized int getConnectionNO(){
 		return cNO;
 	}
 
 	// 接続番号用の鍵 入力
-	protected void setConnectionKEY(int cKEY){
+	protected synchronized void setConnectionKEY(int cKEY){
 		this.cKEY = cKEY;
 	}
 
 	// 接続番号用の鍵 出力
-	protected int getConnectionKEY(){
+	protected synchronized int getConnectionKEY(){
 		return cKEY;
 	}
 
 	// 接続情報のリスト 入力
-	protected void setInfoList(List<String> info){
+	protected synchronized void setInfoList(List<String> info){
 		this.info = info;
 	}
 
 	// 接続情報のリスト 出力
-	protected List<String> getInfoList(){
+	protected synchronized List<String> getInfoList(){
 		return info;
 	}
 
 	// 接続情報のリスト クリア
-	protected void clearInfoList(){
+	protected synchronized void clearInfoList(){
 		info = null;
 	}
 
 // ユーザ情報
 
 	// ユーザ名 入力
-	public void setUserName(String user_name){
+	public synchronized void setUserName(String user_name){
 		this.user_name = user_name;
 	}
 
 	// ユーザ名 出力
-	public String getUserName(){
+	public synchronized String getUserName(){
 		return user_name;
 	}
 
 	// メールアドレス 入力
-	public void setEmail(String email){
+	public synchronized void setEmail(String email){
 		this.email = email;
 	}
 
 	// メールアドレス 出力
-	protected String getEmail(){
+	protected synchronized String getEmail(){
 		return email;
 	}
 
 	// パスワード 入力
-	public void setPassword(String password){
+	public synchronized void setPassword(String password){
 		this.password = password;
 	}
 
 	// パスワード 出力
-	protected String getPassword(){
+	protected synchronized String getPassword(){
 		return password;
 	}
 
 	// 誕生日 入力
-	public void setBirthDay(String birth_day){
+	public synchronized void setBirthDay(String birth_day){
 		this.birth_day = birth_day;
 	}
 
 	// 誕生日 出力
-	public String getBirthDay(){
+	public synchronized String getBirthDay(){
 		return birth_day;
 	}
 
 	// ワンタイムパスワード 入力
-	public void setOTP(String otp){
+	public synchronized void setOTP(String otp){
 		this.otp = otp;
 	}
 
 	// ワンタイムパスワード 出力
-	protected String getOTP(){
+	protected synchronized String getOTP(){
 		return otp;
 	}
 
 	// ユーザ情報クリア
-	protected void clearUser(){
+	protected synchronized void clearUser(){
 		// 初期化
 		setUserName(null);// null値で初期化
 		setPassword(null);// null値で初期化
@@ -522,7 +552,7 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 登録処理確認 true = 完了, false = 失敗
-	public boolean check(){
+	public synchronized boolean check(){
 		return check;
 	}
 }

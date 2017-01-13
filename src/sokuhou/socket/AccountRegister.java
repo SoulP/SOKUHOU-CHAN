@@ -66,9 +66,8 @@ public class AccountRegister extends JSocket{
 // 03. CLがSVに接続を要求する(接続情報の接続番号は0000)
 				// アカウントの登録を要求する
 				createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-				setDataBytes(str2bytes("$REGISTER:USER;"));// 文字列をバイト列に出力する
-				buildBytes();// 送信用バイト列に構築する
-				send(getAllBytes());// 構築したバイト列を送信する
+				buildBytes(str2bytes("$REGISTER:USER;"));// 送信用バイト列に構築する
+				send();// 構築したバイト列を送信する
 
 				while(!recvBoolean());
 				// サーバーへのアクセス可否確認 true = OK, false = NG

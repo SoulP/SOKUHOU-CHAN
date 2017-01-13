@@ -29,7 +29,7 @@ public class Service extends JSocket{
 			calendar.start();
 			// ウォッチドッグタイマ
 			WatchDogTimer wdt = new WatchDogTimer(getSocket());
-			wdt.start();
+			wdt.start();// 監視開始
 
 			// クライアント情報
 			clientIP = getClientIPaddress();// 送信元のIPアドレス取得
@@ -44,14 +44,13 @@ public class Service extends JSocket{
 
 // DB操作でブラックリスト取得する
 
-			boolean check = true;
+boolean check = true;// 一時的なテスト用 あとで消す
 
 			try{
-				wdt.success();
-				if(wdt.isAlive()) wdt.join();
+				wdt.success();// 監視終了
+				if(wdt.isAlive()) wdt.join();// 監視終了待ち
 				if(!check){
-					// クライアントにfalse送信
-					sendBoolean(false);
+					sendBoolean(false);// クライアントにfalse送信
 
 // DB操作でDBにアクセスの結果(失敗)と日時など、と原因を記録する
 
@@ -64,7 +63,7 @@ public class Service extends JSocket{
 					calendar.stopSafety();// 安全停止
 					return;
 				}
-				sendBoolean(true);
+				sendBoolean(true);// クライアントにtrueを送信する
 // DB操作でDBにアクセスの結果成功と日時など記録する
 
 				// 日時表示
@@ -73,10 +72,14 @@ public class Service extends JSocket{
 				System.out.println("IPaddr: " + clientIP + " HostName: " + clientHostName + "Port: " + clientPort + "; ACCESS SUCCESS");
 				System.out.println();
 
-				wdt.start();
-				byte[] data = recv();
-				List<String> info = getInfo();
-				if(
+				wdt.start();// 監視開始
+
+				// 受信
+				byte[] data = recv();// 受信
+				List<String> info = getInfo();// 接続情報取得
+
+				// 接続情報から基づいて判断する
+				if(// アカウント登録処理
 					info.get(0).equals("0000")
 					&&
 					info.get(1).equals(ctrl.WRITE)

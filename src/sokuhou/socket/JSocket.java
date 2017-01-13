@@ -114,6 +114,11 @@ public abstract class JSocket extends Thread{
 	}
 
 	// 送信 バイト列
+	protected synchronized void send() throws IOException{
+		dos.write(getAllBytes());
+	}
+
+	// 送信 バイト列
 	protected synchronized void send(byte[] bytes) throws IOException{
 		dos.write(bytes);
 	}

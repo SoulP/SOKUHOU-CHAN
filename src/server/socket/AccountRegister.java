@@ -43,12 +43,12 @@ public class AccountRegister extends JSocket{
 	// スレッド
 	public void run(){
 		try {
-			if(wdt == null) throw new Exception("Error: WatchDogTimer wdt is null.");
+			if(wdt == null) throw new Exception("Error: WatchDogTimer wdt is null.");// ウォッチドッグタイマがnullの場合、エラー発生させる
 			// バイト列のデータを文字列に変換
 			String strData = bytes2str(data);
 
-			wdt.success();
-			if(wdt.isAlive()) wdt.join();
+			wdt.success();// 監視終了
+			if(wdt.isAlive()) wdt.join();// 監視終了待ち
 
 			// 確認
 			if(!strData.equals("$REGISTER:USER;")){// 異なる場合
@@ -63,7 +63,7 @@ public class AccountRegister extends JSocket{
 			// 受信
 			data = recv("0000");// クライアントの公開鍵のバイト列取得
 
-			wdt.start();
+			wdt.start();// 監視開始
 
 			clientPublicKey = JCipher.bytes2publicKey(data);// バイト列を公開鍵に変換
 			JEncrypt enc = new JEncrypt(cipher.RSA, clientPublicKey);// 暗号化
@@ -85,16 +85,23 @@ public class AccountRegister extends JSocket{
 			if(wdt.isAlive()) wdt.join();
 			send(getAllBytes());// 構築したバイト列を送信する
 
-			while(!recvBoolean());
-			wdt.start();
+			while(!recvBoolean());// クライアント待ち
+			wdt.start();// 監視開始
 
 			// 接続番号と接続鍵の発行
 			setConnectionNO(randomNO(4));// 接続番号
 			setConnectionKEY(randomNO(4));// 接続鍵
+
 			// 送信データ作成
 			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			strTEMP = getConnectionNO() + "" + getConnectionKEY();
-			buildBytes(str2bytes(strTEMP));
+			strTEMP = getConnectionNO() + "" + getConnectionKEY();// 接続番号と接続鍵を文字列にし、一時的保管
+			buildBytes(str2bytes(strTEMP));// バイト列に変換し、構築する
+			wdt.success();// 監視終了
+			if(wdt.isAlive()) wdt.join();// 監視終了待ち
+			send();// 送信
+
+			setConnectionNO(nextConnect());
+			//
 
 			enc = new JEncrypt(cipher.AES, getSecretKey());
 			//

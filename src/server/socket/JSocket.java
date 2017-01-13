@@ -31,6 +31,15 @@ public abstract class JSocket extends Thread{
 	private int cKEY, cNO;// 接続情報の接続番号用の鍵と接続番号
 	private List<String> info;// 接続情報のリスト
 	protected boolean check;// 確認
+	protected transient String strTEMP;// 文字列の一時的な変数
+	protected transient int intTEMP;// int型の一時的な変数
+	protected transient byte[] bytesTEMP;// バイト列の一時的な変数
+	protected transient byte byteTEMP;// バイト型の一時的な変数
+	protected transient long longTEMP;// long型の一時的な変数
+	protected transient float floatTEMP;// float型の一時的な変数
+	protected transient double doubleTEMP;// double型の一時的な変数
+	protected transient char charTEMP;// char型の一時的な変数
+	protected transient char[] charsTEMP;// char型配列の一時的な変数
 
 	// コンストラクタ
 	public JSocket(){

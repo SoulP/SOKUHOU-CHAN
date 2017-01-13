@@ -13,6 +13,7 @@ public class AccountRegister extends JSocket{
 	private byte[] data;
 	protected WatchDogTimer wdt;
 	protected PublicKey clientPublicKey;// クライアントの公開鍵
+	protected transient String tmp;
 
 	// コンストラクタ
 	public AccountRegister(){
@@ -87,6 +88,14 @@ public class AccountRegister extends JSocket{
 
 			while(!recvBoolean());
 			wdt.start();
+
+			// 接続番号と接続鍵の発行
+			setConnectionNO(randomNO(4));// 接続番号
+			setConnectionKEY(randomNO(4));// 接続鍵
+			// 送信データ作成
+			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
+			tmp = "";
+			buildBytes();
 
 			enc = new JEncrypt(cipher.AES, getSecretKey());
 			//

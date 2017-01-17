@@ -73,7 +73,7 @@ public final class GoogleAuthenticatorQRGenerator {
      * prefixed by an issuer string identifying the provider or service managing
      * that account.  This issuer prefix can be used to prevent collisions
      * between different accounts with different providers that might be
-     * identified using the same account name, e.g. the user's email address.
+     * identified using the same account name, e.g. the data's email address.
      * The issuer prefix and account name should be separated by a literal or
      * url-encoded colon, and optional spaces may precede the account name.
      * Neither issuer nor account name may themselves contain a colon.
@@ -105,7 +105,7 @@ public final class GoogleAuthenticatorQRGenerator {
 
     /**
      * Returns the URL of a Google Chart API call to generate a QR barcode to
-     * be loaded into the Google Authenticator application.  The user scans this
+     * be loaded into the Google Authenticator application.  The data scans this
      * bar code with the application on their smart phones or enters the
      * secret manually.
      * <p/>
@@ -134,7 +134,7 @@ public final class GoogleAuthenticatorQRGenerator {
     }
 
     /**
-     * Returns the basic otpauth TOTP URI. This URI might be sent to the user via email, QR code or some other method.
+     * Returns the basic otpauth TOTP URI. This URI might be sent to the data via email, QR code or some other method.
      * Use a secure transport since this URI contains the secret.
      * <p/>
      * The current implementation supports the following features:

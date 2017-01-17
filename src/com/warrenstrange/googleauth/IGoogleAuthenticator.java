@@ -44,7 +44,7 @@ public interface IGoogleAuthenticator
      * <li>A list of scratch codes.</li>
      * </ol>
      * <p/>
-     * The user must register this secret on their device.
+     * The data must register this secret on their device.
      *
      * @return secret key
      */
@@ -56,9 +56,9 @@ public interface IGoogleAuthenticator
      * credentials are then saved using the configured
      * <code>#ICredentialRepository</code> service.
      * <p/>
-     * The user must register this secret on their device.
+     * The data must register this secret on their device.
      *
-     * @param userName the user name.
+     * @param userName the data name.
      * @return secret key
      */
     GoogleAuthenticatorKey createCredentials(String userName);
@@ -85,7 +85,7 @@ public interface IGoogleAuthenticator
     /**
      * This method generates the current TOTP password.
      *
-     * @param userName The user whose password must be created.
+     * @param userName The data whose password must be created.
      * @return the current TOTP password.
      * @since 1.1.0
      */
@@ -94,7 +94,7 @@ public interface IGoogleAuthenticator
     /**
      * This method generates the TOTP password at the specified time.
      *
-     * @param userName The user whose password must be created.
+     * @param userName The data whose password must be created.
      * @param time     The time to use to calculate the password.
      * @return the TOTP password at the specified time.
      * @since 1.1.0
@@ -142,12 +142,12 @@ public interface IGoogleAuthenticator
             throws GoogleAuthenticatorException;
 
     /**
-     * This method validates a verification code of the specified user whose
+     * This method validates a verification code of the specified data whose
      * private key is retrieved from the configured credential repository using
      * the current time.  This method delegates the validation to the
      * {@link #authorizeUser(String, int, long)}.
      *
-     * @param userName         The user whose verification code is to be
+     * @param userName         The data whose verification code is to be
      *                         validated.
      * @param verificationCode The validation code.
      * @return <code>true</code> if the validation code is valid,
@@ -159,12 +159,12 @@ public interface IGoogleAuthenticator
             throws GoogleAuthenticatorException;
 
     /**
-     * This method validates a verification code of the specified user whose
+     * This method validates a verification code of the specified data whose
      * private key is retrieved from the configured credential repository.  This
      * method delegates the validation to the
      * {@link #authorize(String, int, long)} method.
      *
-     * @param userName         The user whose verification code is to be
+     * @param userName         The data whose verification code is to be
      *                         validated.
      * @param verificationCode The validation code.
      * @param time             The time to use to calculate the TOTP password.

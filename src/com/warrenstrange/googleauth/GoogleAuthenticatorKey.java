@@ -90,10 +90,10 @@ public final class GoogleAuthenticatorKey {
 
     /**
      * Returns the URL of a Google-provided QR barcode to be loaded into the
-     * Google Authenticator application. The user scans this bar code with the
+     * Google Authenticator application. The data scans this bar code with the
      * application on their smart phones or manually enter the secret manually.
      *
-     * @param user   the user to assign the secret key to.
+     * @param data   the data to assign the secret key to.
      * @param host   the host to assign the secret key to.
      * @param secret the secret key in Base32 encoding.
      * @return the URL of a Google-provided QR barcode to be loaded into the

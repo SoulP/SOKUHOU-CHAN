@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 import javax.swing.JLogin;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.event.EventListenerList;
@@ -19,7 +19,7 @@ public class WinLogin extends JLogin {
 	EventListenerList evList;
 	
 	public JLogin[] wLogin;
-	 @RequestMapping(value = "/", method = RequestMethod.POST)
+	@RequestMapping(value = "/", method = RequestMethod.POST)
 	    public String postLogin(@RequestParam("userid") String pUserId,
 	                             @RequestParam("password") String password,
 	                             Locale locale,

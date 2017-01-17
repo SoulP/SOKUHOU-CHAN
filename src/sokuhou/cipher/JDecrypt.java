@@ -3,6 +3,7 @@ package sokuhou.cipher;
 import java.security.Key;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 
 // 復号化
 public class JDecrypt extends JCipher{
@@ -90,7 +91,8 @@ public class JDecrypt extends JCipher{
 	// AES 復号化
 	private void AES(Key key, byte[] bytes){
 		try {
-			aes.init(Cipher.DECRYPT_MODE, key);
+			IvParameterSpec ivPS = new IvParameterSpec(getIV());
+			aes.init(Cipher.DECRYPT_MODE, key, ivPS);
 			this.bytes = aes.doFinal(bytes);
 		} catch (Exception e) {
 			System.out.println(e);

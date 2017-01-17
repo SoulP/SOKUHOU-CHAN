@@ -1,9 +1,9 @@
 package sokuhou.socket;
 
+import cipher.JCipher;
+import cipher.JDecrypt;
+import cipher.JEncrypt;
 import sokuhou.MainSYS;
-import sokuhou.cipher.JCipher;
-import sokuhou.cipher.JDecrypt;
-import sokuhou.cipher.JEncrypt;
 
 public class Recv extends JSocket{
 	private String setRecv;// 操作用の文字列

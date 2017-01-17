@@ -1,8 +1,8 @@
 package sokuhou.socket;
 
+import cipher.JCipher;
+import cipher.JEncrypt;
 import sokuhou.MainSYS;
-import sokuhou.cipher.JCipher;
-import sokuhou.cipher.JEncrypt;
 
 public class Send extends JSocket{
 	private String setSend;// 操作用の文字列

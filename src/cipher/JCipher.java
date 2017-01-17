@@ -1,4 +1,4 @@
-package server.cipher;
+package cipher;
 
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;

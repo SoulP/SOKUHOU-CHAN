@@ -1,4 +1,4 @@
-package server.database;
+package server.io;
 
 public abstract class Oracle extends Thread {
 	// 抽象クラス

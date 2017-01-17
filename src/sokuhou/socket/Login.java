@@ -3,11 +3,11 @@ package sokuhou.socket;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
+import cipher.JCipher;
+import cipher.JDecrypt;
+import cipher.JEncrypt;
+import cipher.JCipher.cipher;
 import sokuhou.MainSYS;
-import sokuhou.cipher.JCipher;
-import sokuhou.cipher.JDecrypt;
-import sokuhou.cipher.JEncrypt;
-import sokuhou.cipher.JCipher.cipher;
 
 public class Login extends JSocket{
 

@@ -1,18 +1,17 @@
-package server.cipher;
+package cipher;
 
 import java.security.Key;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
 
-// 復号化
-public class JDecrypt extends JCipher{
-	private cipher type;// 復号化のアルゴリズム
+// 暗号化
+public class JEncrypt extends JCipher{
+	private cipher type;// 暗号化のアルゴリズム
 	private Key key;// 鍵
 	private byte[] bytes;// バイト列
 
 	// コンストラクタ
-	public JDecrypt(){
+	public JEncrypt(){
 		// 初期化
 		super();
 		type = null;// null値で初期化
@@ -21,7 +20,7 @@ public class JDecrypt extends JCipher{
 	}
 
 	// コンストラクタ
-	public JDecrypt(cipher type){
+	public JEncrypt(cipher type){
 		// 初期化
 		super();
 		this.type = type;// typeからコピー
@@ -30,7 +29,7 @@ public class JDecrypt extends JCipher{
 	}
 
 	// コンストラクタ
-	public JDecrypt(cipher type, Key key){
+	public JEncrypt(cipher type, Key key){
 		// 初期化
 		super();
 		this.type = type;// typeからコピー
@@ -39,7 +38,7 @@ public class JDecrypt extends JCipher{
 	}
 
 	// コンストラクタ
-	public JDecrypt(cipher type, Key key, byte[] bytes){
+	public JEncrypt(cipher type, Key key, byte[] bytes){
 		// 初期化
 		super();
 		this.type = type;// typeからコピー
@@ -47,12 +46,12 @@ public class JDecrypt extends JCipher{
 		this.bytes = bytes;// bytesからコピー
 	}
 
-	// 復号化のアルゴリズム 入力
+	// 暗号化のアルゴリズム 入力
 	public void setType(cipher type){
 		this.type = type;
 	}
 
-	// 復号化のアルゴリズム 出力
+	// 暗号化のアルゴリズム 出力
 	public cipher getType(){
 		return type;
 	}
@@ -67,20 +66,20 @@ public class JDecrypt extends JCipher{
 		return key;
 	}
 
-	// バイト列 入力 (暗号化されたバイト列 入力)
+	// バイト列 入力 (通常のバイト列 入力)
 	public void setBytes(byte[] bytes){
 		this.bytes = bytes;
 	}
 
-	// バイト列 出力 (復号化されたバイト列 出力)
+	// バイト列 出力 (暗号化されたバイト列 出力)
 	public byte[] getBytes(){
 		return bytes;
 	}
 
-	// RSA 復号化
+	// RSA 暗号化
 	private void RSA(Key key, byte[] bytes){
 		try {
-			rsa.init(Cipher.DECRYPT_MODE, key);
+			rsa.init(Cipher.ENCRYPT_MODE, key);
 			this.bytes = rsa.doFinal(bytes);
 		} catch (Exception e) {
 			System.out.println(e);
@@ -88,11 +87,11 @@ public class JDecrypt extends JCipher{
 		}
 	}
 
-	// AES 復号化
+	// AES 暗号化
 	private void AES(Key key, byte[] bytes){
 		try {
-			IvParameterSpec ivPS = new IvParameterSpec(getIV());
-			aes.init(Cipher.DECRYPT_MODE, key, ivPS);
+			aes.init(Cipher.ENCRYPT_MODE, key);
+			setIV(aes.getIV());
 			this.bytes = aes.doFinal(bytes);
 		} catch (Exception e) {
 			System.out.println(e);

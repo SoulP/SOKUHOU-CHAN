@@ -188,4 +188,38 @@ public abstract class JCipher extends Thread{
 			return null;
 		}
 	}
+
+	// ハッシュコード生成
+	public static String toHashCode(hash algorithmName, byte[] bytes){
+		byte[] temp = new byte[bytes.length];
+		System.arraycopy(bytes, 0, temp, 0, bytes.length);
+		String algorithm = "";
+		switch(algorithmName){
+			case MD2: algorithm = "MD2"; break;
+			case MD5: algorithm = "MD5"; break;
+			case SHA1: algorithm = "SHA-1"; break;
+			case SHA256: algorithm = "SHA-256"; break;
+			case SHA384: algorithm = "SHA-384"; break;
+			case SHA512: algorithm = "SHA-512"; break;
+			default: algorithm = "SHA"; break;
+		}
+
+		MessageDigest md = null;
+		StringBuilder sb = null;
+
+		try {
+			md = MessageDigest.getInstance(algorithm);
+			md.update(temp);
+			sb = new StringBuilder();
+			for(byte b : md.digest()){
+				String hex = String.format("%02x", b);
+				sb.append(hex);
+			}
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println(e);
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

@@ -3,7 +3,7 @@ package server.socket;
 import java.net.Socket;
 import java.util.List;
 
-import server.io.JCalendar;
+import io.JCalendar;
 
 public class Service extends JSocket{
 	public String clientIP;// クライアントのIPアドレス

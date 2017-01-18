@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 
 public final class Converter {
 	// オブジェクトからバイト列に変換
@@ -34,4 +35,28 @@ public final class Converter {
 			return null;
 		}
 	}
+
+	// 文字列からバイト列に変換
+	public static byte[] string2bytes(String str){
+		try {
+			return str.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			System.out.println(e);
+			e.printStackTrace();
+			return str.getBytes();
+		}
+	}
+
+	// バイト列から文字列に変換
+	public static String bytes2string(byte[] bytes){
+		try {
+			return new String(bytes, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			System.out.println(e);
+			e.printStackTrace();
+			return new String(bytes);
+		}
+	}
+
+
 }

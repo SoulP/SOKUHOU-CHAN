@@ -1,4 +1,4 @@
-package server.cipher;
+package cipher;
 
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -28,21 +29,24 @@ public abstract class JCipher extends Thread{
 	private PrivateKey privateKEY;// 秘密鍵
 	private PublicKey publicKEY;// 公開鍵
 	private static KeyFactory keyfactory;// バイト列から鍵に変換など
+	private byte[] iv;
 
 	// コンストラクタ
 	public JCipher(){
 		// 初期化
-		 try {
+		try {
+			SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 			rsa = Cipher.getInstance("RSA");// アルゴリズムのRSA
-			aes = Cipher.getInstance("AES");// アルゴリズムのAES
+			aes = Cipher.getInstance("AES/CBC/NoPadding");// アルゴリズムのAES
 			keygenRSA = KeyPairGenerator.getInstance("RSA");// アルゴリズムRSAの鍵生成
 			keygenAES = KeyGenerator.getInstance("AES");// アルゴリズムAESの鍵生成
 			keyfactory = KeyFactory.getInstance("RSA");// バイト列から鍵に変換など
-			keygenRSA.initialize(2048);// 鍵長を2048ビットに初期化
-			keygenAES.init(256);// 鍵長を256ビットに初期化
+			keygenRSA.initialize(2048, random);// 鍵長を2048ビットに初期化
+			keygenAES.init(256, random);// 鍵長を256ビットに初期化
 			privateKEY = null;// null値で初期化
 			publicKEY = null;// null値で初期化
 			secretKEY = null;// null値で初期化
+			iv = null;
 			generateRSA_KEY();// 公開鍵、秘密鍵の生成
 			generateAES_KEY();// 共通鍵の生成
 		} catch (Exception e) {
@@ -141,6 +145,16 @@ public abstract class JCipher extends Thread{
 	// バイト列から共通鍵 変換
 	public static SecretKey bytes2secretKey(byte[] secretKeyBytes){
 		return new SecretKeySpec(secretKeyBytes, "AES");
+	}
+
+	// IV 入力
+	public void setIV(byte[] iv){
+		this.iv = iv;
+	}
+
+	// IV 出力
+	public byte[] getIV(){
+		return iv;
 	}
 
 	// ハッシュコード生成

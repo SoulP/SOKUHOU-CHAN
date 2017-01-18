@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  * <p/>
  * This class lets users create a new 16-bit base32-encoded secret key with
  * the validation code calculated at {@code time = 0} (the UNIX epoch) and the
- * URL of a Google-provided QR barcode to let an user load the generated
+ * URL of a Google-provided QR barcode to let an data load the generated
  * information into Google Authenticator.
  * <p/>
  * The random number generator used by this class uses the default algorithm and
@@ -556,7 +556,7 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator
     public boolean authorize(String secret, int verificationCode, long time)
             throws GoogleAuthenticatorException
     {
-        // Checking user input and failing if the secret key was not provided.
+        // Checking data input and failing if the secret key was not provided.
         if (secret == null)
         {
             throw new IllegalArgumentException("Secret cannot be null.");

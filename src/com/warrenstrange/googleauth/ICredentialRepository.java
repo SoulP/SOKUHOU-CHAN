@@ -37,17 +37,17 @@ import java.util.List;
  */
 public interface ICredentialRepository {
     /**
-     * This method retrieves the Base32-encoded private key of the given user.
+     * This method retrieves the Base32-encoded private key of the given data.
      *
-     * @param userName the user whose private key shall be retrieved.
-     * @return the private key of the specified user.
+     * @param userName the data whose private key shall be retrieved.
+     * @return the private key of the specified data.
      */
     String getSecretKey(String userName);
 
     /**
-     * This method saves the user credentials.
+     * This method saves the data credentials.
      *
-     * @param userName       the user whose data shall be saved.
+     * @param userName       the data whose data shall be saved.
      * @param secretKey      the generated key.
      * @param validationCode the validation code.
      * @param scratchCodes   the list of scratch codes.

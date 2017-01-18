@@ -1,4 +1,4 @@
-package server.cipher;
+package cipher;
 
 import java.security.Key;
 
@@ -91,6 +91,7 @@ public class JEncrypt extends JCipher{
 	private void AES(Key key, byte[] bytes){
 		try {
 			aes.init(Cipher.ENCRYPT_MODE, key);
+			setIV(aes.getIV());
 			this.bytes = aes.doFinal(bytes);
 		} catch (Exception e) {
 			System.out.println(e);

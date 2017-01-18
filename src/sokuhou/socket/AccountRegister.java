@@ -6,10 +6,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
-import sokuhou.cipher.JCipher;
-import sokuhou.cipher.JCipher.cipher;
-import sokuhou.cipher.JDecrypt;
-import sokuhou.cipher.JEncrypt;
+import cipher.JCipher;
+import cipher.JDecrypt;
+import cipher.JEncrypt;
+import cipher.JCipher.cipher;
 
 public class AccountRegister extends JSocket{
 	volatile ResourceBundle rb;

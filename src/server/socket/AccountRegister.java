@@ -3,10 +3,10 @@ package server.socket;
 import java.security.PublicKey;
 import java.util.List;
 
-import server.cipher.JCipher;
-import server.cipher.JCipher.cipher;
-import server.cipher.JDecrypt;
-import server.cipher.JEncrypt;
+import cipher.JCipher;
+import cipher.JCipher.cipher;
+import cipher.JDecrypt;
+import cipher.JEncrypt;
 
 public class AccountRegister extends JSocket{
 	// インスタンス変数

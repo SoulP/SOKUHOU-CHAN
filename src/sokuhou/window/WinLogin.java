@@ -2,15 +2,24 @@ package sokuhou.window;
 
 import javax.swing.*;
 
+import cipher.JCipher;
 import sokuhou.Lang;
 import sokuhou.MainSYS;
 
 import java.awt.event.*;
 import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 @SuppressWarnings("serial")
 public class WinLogin extends JFrame {
+	// CHAP認証
+	@SuppressWarnings("unused")
+	private String CHAP(String password, int chap) throws UnsupportedEncodingException{
+		BigInteger bigInt = new BigInteger(password.getBytes("UTF-8"));
+		bigInt = bigInt.pow(chap);
+		return JCipher.toHashCode(JCipher.hash.SHA512, bigInt.toString());
+	}
   JButton blogin;
   JPanel loginpanel;
   JTextField txuser;
@@ -99,6 +108,10 @@ public class WinLogin extends JFrame {
           if(puname.equals(usertxt) && ppaswd.equals(passtxt)) {
             MainSYS menu =new MainSYS();
             dispose();
+            while (scan.hasNext()) {
+                usertxt = scan.nextLine();
+                passtxt = scan.nextLine();
+            }
           } 
           else if(puname.equals("") && ppaswd.equals("")){
             JOptionPane.showMessageDialog(null,"Please insert Username and Password");

@@ -95,16 +95,8 @@ public class WinLogin extends JFrame {
           String puname = txuser.getText();
           String ppaswd = pass.getText();
 
-
-          while (scan.hasNext()) {
-            usertxt = scan.nextLine();
-            passtxt = scan.nextLine();
-
-          }
-
-
-
-
+          
+          
           if(puname.equals(usertxt) && ppaswd.equals(passtxt)) {
             MainSYS menu =new MainSYS();
             dispose();

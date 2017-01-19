@@ -1,54 +1,130 @@
 package sokuhou.window;
 
-import java.util.ResourceBundle;
-
-import javax.swing.JLogin;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.event.EventListenerList;
+import javax.swing.*;
 
 import sokuhou.Lang;
 import sokuhou.MainSYS;
 
-public class WinLogin extends JLogin {
-	// インスタンス変数
-	volatile ResourceBundle rb;
-	EventListenerList evList;
-	
-	public JLogin[] wLogin;
-	@RequestMapping(value = "/", method = RequestMethod.POST)
-	    public String postLogin(@RequestParam("userid") String pUserId,
-	                             @RequestParam("password") String password,
-	                             Locale locale,
-	                             Model model) {
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
-	        try{
-
-	            logger.info("Login VikingEgg(LoginPOST)  The client locale is {}.", locale);
+@SuppressWarnings("serial")
+public class WinLogin extends JFrame {
+  JButton blogin;
+  JPanel loginpanel;
+  JTextField txuser;
+  JTextField pass;
+  JButton newUSer;
+  JLabel username;
+  JLabel password;
 
 
-	            String userId = pUserId;
-	            String pass = password;
+  public WinLogin(){
+    super("Login Autentification");
 
-	            String retForm = "";
+    blogin = new JButton("Login");
+    loginpanel = new JPanel();
+    txuser = new JTextField(15);
+    pass = new JPasswordField(15);
+    newUSer = new JButton("New User?");
+    username = new JLabel("User - ");
+    password = new JLabel("Pass - ");
 
-	            // 入力エラーメッセージクリア
-	            model.addAttribute("errorMessage","");
-
-	            retForm = "/";
-
-
-	            loginService.GetUserInfo(userId, pass);
+    setSize(300,200);
+    setLocation(500,280);
+    loginpanel.setLayout (null); 
 
 
-	            String ErrMsg = loginService.UserIDCheck();
+    txuser.setBounds(70,30,150,20);
+    pass.setBounds(70,65,150,20);
+    blogin.setBounds(110,100,80,20);
+    newUSer.setBounds(110,135,80,20);
+    username.setBounds(20,28,80,20);
+    password.setBounds(20,63,80,20);
 
-	            if (ErrMsg == ""){
+    loginpanel.add(blogin);
+    loginpanel.add(txuser);
+    loginpanel.add(pass);
+    loginpanel.add(newUSer);
+    loginpanel.add(username);
+    loginpanel.add(password);
 
-	                // メニュー
-	                retForm = loginService.getMenu();
+    getContentPane().add(loginpanel);
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setVisible(true);
+
+    Writer writer = null;
+    File check = new File("userPass.txt");
+    if(check.exists()){
+
+      //Checks if the file exists. will not add anything if the file does exist.
+    }else{
+      try{
+        File texting = new File("userPass.txt");
+        writer = new BufferedWriter(new FileWriter(texting));
+        writer.write("message");
+      }catch(IOException e){
+        e.printStackTrace();
+      }
+    }
+
+
+
+
+    blogin.addActionListener(new ActionListener() {
+      @SuppressWarnings({ "unused", "resource" })
+	public void actionPerformed(ActionEvent e) {
+        try {
+          File file = new File("userPass.txt");
+          Scanner scan = new Scanner(file);;
+          String line = null;
+          FileWriter filewrite = new FileWriter(file, true);
+
+          String usertxt = " ";
+          String passtxt = " ";
+          String puname = txuser.getText();
+          String ppaswd = pass.getText();
+
+
+          while (scan.hasNext()) {
+            usertxt = scan.nextLine();
+            passtxt = scan.nextLine();
+
+          }
+
+
+
+
+          if(puname.equals(usertxt) && ppaswd.equals(passtxt)) {
+            MainSYS menu =new MainSYS();
+            dispose();
+          } 
+          else if(puname.equals("") && ppaswd.equals("")){
+            JOptionPane.showMessageDialog(null,"Please insert Username and Password");
+          }
+          else {
+
+            JOptionPane.showMessageDialog(null,"Wrong Username / Password");
+            txuser.setText("");
+            pass.setText("");
+            txuser.requestFocus();
+          }
+        } catch (IOException d) {
+          d.printStackTrace();
+        }
+
+      }
+    });
+
+    newUSer.addActionListener(new ActionListener(){
+      public void actionPerformed(ActionEvent e) {
+        @SuppressWarnings("unused")
+		Lang user = new Lang();
+        dispose();
+
+      }
+    });
+  } 
 
 }

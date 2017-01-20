@@ -23,9 +23,11 @@ public class WinLogin extends JFrame {
   JButton blogin;
   JPanel loginpanel;
   JTextField txuser;
+  JTextField pemail;
   JTextField pass;
   JButton newUSer;
   JLabel username;
+  JLabel email;
   JLabel password;
 
 
@@ -35,9 +37,11 @@ public class WinLogin extends JFrame {
     blogin = new JButton("Login");
     loginpanel = new JPanel();
     txuser = new JTextField(15);
+    pemail = new JTextField(15);
     pass = new JPasswordField(15);
     newUSer = new JButton("New User?");
     username = new JLabel("User - ");
+    email = new JLabel("email - ");
     password = new JLabel("Pass - ");
 
     setSize(300,200);
@@ -46,10 +50,12 @@ public class WinLogin extends JFrame {
 
 
     txuser.setBounds(70,30,150,20);
+    pemail.setBounds(70,30,150,20);
     pass.setBounds(70,65,150,20);
     blogin.setBounds(110,100,80,20);
     newUSer.setBounds(110,135,80,20);
     username.setBounds(20,28,80,20);
+    email.setBounds(20,28,80,20);
     password.setBounds(20,63,80,20);
 
     loginpanel.add(blogin);
@@ -57,6 +63,7 @@ public class WinLogin extends JFrame {
     loginpanel.add(pass);
     loginpanel.add(newUSer);
     loginpanel.add(username);
+    loginpanel.add(email);
     loginpanel.add(password);
 
     getContentPane().add(loginpanel);
@@ -91,27 +98,31 @@ public class WinLogin extends JFrame {
           FileWriter filewrite = new FileWriter(file, true);
 
           String usertxt = " ";
+          String emailtxt = " ";
           String passtxt = " ";
           String puname = txuser.getText();
+          String peemail = email.getText();
           String ppaswd = pass.getText();
 
           
           
           if(puname.equals(usertxt) && ppaswd.equals(passtxt)) {
-            MainSYS menu =new MainSYS();
+            MainSYS menu = new MainSYS();
             dispose();
             while (scan.hasNext()) {
                 usertxt = scan.nextLine();
+                emailtxt = scan.nextLine();
                 passtxt = scan.nextLine();
             }
           } 
           else if(puname.equals("") && ppaswd.equals("")){
-            JOptionPane.showMessageDialog(null,"Please insert Username and Password");
+            JOptionPane.showMessageDialog(null,"Please insert Username and Email and Password");
           }
           else {
 
-            JOptionPane.showMessageDialog(null,"Wrong Username / Password");
+            JOptionPane.showMessageDialog(null,"Wrong Username / Email / Password");
             txuser.setText("");
+            pemail.setText("");
             pass.setText("");
             txuser.requestFocus();
           }

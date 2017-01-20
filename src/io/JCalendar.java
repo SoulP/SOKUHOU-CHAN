@@ -1,4 +1,4 @@
-package server.io;
+package io;
 
 import java.util.Calendar;
 
@@ -68,15 +68,17 @@ public class JCalendar extends Thread{
 
 	// コンストラクタ
 	public JCalendar(){
-		year = month = date = day = hour = minute = second = 0;// 0の値で初期化
-		lang = 0;// 0の値で初期化、デフォルトを日本語にする
+		// 初期化
+		year = month = date = day = hour = minute = second = -1;
+		lang = 0;
 		bool = true;
 	}
 
 	// コンストラクタ
 	public JCalendar(int lang){
-		year = month = date = day = hour = minute = second = 0;// 0の値で初期化
-		this.lang = lang;// 値をコピー
+		// 初期化
+		year = month = date = day = hour = minute = second = 0;
+		this.lang = lang;
 		bool = true;
 	}
 
@@ -84,25 +86,35 @@ public class JCalendar extends Thread{
 	public void run(){
 		bool = true;
 		while(bool){
-			try{
-				// カレンダー
-				Calendar calendar = Calendar.getInstance();// インスタンス取得
-				year   = calendar.get(Calendar.YEAR);// 年の値取得
-				month  = calendar.get(Calendar.MONTH) + 1;// 月の値取得
-				date   = calendar.get(Calendar.DATE);// 日の値取得
-				day    = calendar.get(Calendar.DAY_OF_WEEK) - 1;// 曜日の値取得
-				day    = (day == 0)? 7 : day - 1;// 曜日の値変更
-				hour   = calendar.get(Calendar.HOUR_OF_DAY);// 時の値取得
-				minute = calendar.get(Calendar.MINUTE);// 分の値取得
-				second = calendar.get(Calendar.SECOND);// 秒の値取得
-			}catch (Exception e){
-				// エラー起きた場合
-				year = month = date = day = hour = minute = second = 0;// 0の値で初期化
-				bool = false;
-				System.out.println(e);// エラー表示
-				e.printStackTrace();// エラー原因追跡表示
-			}
+			stamp();
 		}
+	}
+
+	// 日時取得
+	private void stamp(){
+		try{
+			// カレンダー
+			Calendar calendar = Calendar.getInstance();// インスタンス取得
+			year   = calendar.get(Calendar.YEAR);// 年の値取得
+			month  = calendar.get(Calendar.MONTH) + 1;// 月の値取得
+			date   = calendar.get(Calendar.DATE);// 日の値取得
+			day    = calendar.get(Calendar.DAY_OF_WEEK) - 1;// 曜日の値取得
+			day    = (day == 0)? 7 : day - 1;// 曜日の値変更
+			hour   = calendar.get(Calendar.HOUR_OF_DAY);// 時の値取得
+			minute = calendar.get(Calendar.MINUTE);// 分の値取得
+			second = calendar.get(Calendar.SECOND);// 秒の値取得
+		}catch (Exception e){
+			// エラー起きた場合
+			year = month = date = day = hour = minute = second = 0;// 0の値で初期化
+			bool = false;
+			System.out.println(e);// エラー表示
+			e.printStackTrace();// エラー原因追跡表示
+		}
+	}
+
+	// 日時取得
+	public synchronized void time(){
+		stamp();
 	}
 
 	// 言語 出力

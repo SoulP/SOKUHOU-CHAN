@@ -96,6 +96,7 @@ public class JDecrypt extends JCipher{
 			this.bytes = aes.doFinal(bytes);
 		} catch (Exception e) {
 			System.out.println(e);
+			e.printStackTrace();
 			this.bytes = null;
 		}
 	}

@@ -3,6 +3,7 @@ package cipher;
 import java.security.Key;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 
 // 暗号化
 public class JEncrypt extends JCipher{
@@ -90,11 +91,17 @@ public class JEncrypt extends JCipher{
 	// AES 暗号化
 	private void AES(Key key, byte[] bytes){
 		try {
-			aes.init(Cipher.ENCRYPT_MODE, key);
-			setIV(aes.getIV());
+			if(getIV() != null){
+				IvParameterSpec ivPS = new IvParameterSpec(getIV());
+				aes.init(Cipher.ENCRYPT_MODE, key, ivPS);
+			}else{
+				aes.init(Cipher.ENCRYPT_MODE, key);
+				setIV(aes.getIV());
+			}
 			this.bytes = aes.doFinal(bytes);
 		} catch (Exception e) {
 			System.out.println(e);
+			e.printStackTrace();
 			this.bytes = null;
 		}
 	}

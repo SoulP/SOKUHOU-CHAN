@@ -18,7 +18,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 // 暗号化・復号化 抽象クラス
-public abstract class JCipher extends Thread{
+public abstract class JCipher implements Runnable{
 	public enum cipher {RSA, AES};// 暗号化・復号化のアルゴリズム
 	public enum hash {MD2, MD5, SHA, SHA1, SHA256, SHA384, SHA512};// ハッシュコードのアルゴリズム
 	protected Cipher rsa;// RSA

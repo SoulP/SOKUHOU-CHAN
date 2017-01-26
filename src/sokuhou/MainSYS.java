@@ -3,10 +3,10 @@ package sokuhou;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 
+import io.JSocket;
 import sokuhou.io.IOsys;
 import sokuhou.network.NetGET;
 import sokuhou.network.NetWork;
-import sokuhou.socket.JSocket;
 
 public class MainSYS {
 	public static JSocket socket;

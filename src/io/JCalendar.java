@@ -2,11 +2,10 @@ package io;
 
 import java.util.Calendar;
 
-public class JCalendar extends Thread{
+public final class JCalendar{
 	// インスタンス変数
 	// 言語
-	private int lang;
-	private boolean bool;
+	private static int lang = 0;
 
 	// 曜日
 	final static String[][] strDay = {
@@ -40,7 +39,7 @@ public class JCalendar extends Thread{
 	final static String[] formatJP = {	"年", "日", "時" , "分" , "秒"};
 
 	// 日付と曜日と時間
-	private static int year, month, date, day, hour, minute, second;
+	private static int year, month, date, day, hour, minute, second = -1;
 
 	// 出力
 	enum output{
@@ -53,6 +52,7 @@ public class JCalendar extends Thread{
 		}
 		// 表示
 		void print(){
+			getTime();
 			if(id == 0){
 				// 日本語フォーマット
 				System.out.print(year + formatJP[0] + strMonth[month - 1][id] + date + formatJP[1] +
@@ -66,117 +66,81 @@ public class JCalendar extends Thread{
 		}
 	}
 
-	// コンストラクタ
-	public JCalendar(){
-		// 初期化
-		year = month = date = day = hour = minute = second = -1;
-		lang = 0;
-		bool = true;
-	}
-
-	// コンストラクタ
-	public JCalendar(int lang){
-		// 初期化
-		year = month = date = day = hour = minute = second = 0;
-		this.lang = lang;
-		bool = true;
-	}
-
-	// スレッド
-	public void run(){
-		bool = true;
-		while(bool){
-			stamp();
-		}
-	}
-
 	// 日時取得
-	private void stamp(){
+	public static void getTime(){
 		try{
 			// カレンダー
-			Calendar calendar = Calendar.getInstance();// インスタンス取得
-			year   = calendar.get(Calendar.YEAR);// 年の値取得
-			month  = calendar.get(Calendar.MONTH) + 1;// 月の値取得
-			date   = calendar.get(Calendar.DATE);// 日の値取得
-			day    = calendar.get(Calendar.DAY_OF_WEEK) - 1;// 曜日の値取得
-			day    = (day == 0)? 7 : day - 1;// 曜日の値変更
-			hour   = calendar.get(Calendar.HOUR_OF_DAY);// 時の値取得
-			minute = calendar.get(Calendar.MINUTE);// 分の値取得
-			second = calendar.get(Calendar.SECOND);// 秒の値取得
+			Calendar calendar	= Calendar.getInstance();					// インスタンス取得
+			year				= calendar.get(Calendar.YEAR);				// 年の値取得
+			month				= calendar.get(Calendar.MONTH) + 1;			// 月の値取得
+			date				= calendar.get(Calendar.DATE);				// 日の値取得
+			day					= calendar.get(Calendar.DAY_OF_WEEK) - 1;	// 曜日の値取得
+			day					= (day == 0)? 7 : day - 1;					// 曜日の値変更
+			hour				= calendar.get(Calendar.HOUR_OF_DAY);		// 時の値取得
+			minute				= calendar.get(Calendar.MINUTE);			// 分の値取得
+			second				= calendar.get(Calendar.SECOND);			// 秒の値取得
 		}catch (Exception e){
-			// エラー起きた場合
-			year = month = date = day = hour = minute = second = 0;// 0の値で初期化
-			bool = false;
-			System.out.println(e);// エラー表示
-			e.printStackTrace();// エラー原因追跡表示
+			// エラー表示
+			System.out.println(e);
+			e.printStackTrace();
+			year = month = date = day = hour = minute = second = -1;		// -1の値で初期化
 		}
-	}
-
-	// 日時取得
-	public synchronized void time(){
-		stamp();
 	}
 
 	// 言語 出力
-	public synchronized int getLang(){
+	public static int getLang(){
 		return lang;
 	}
 
 	// 言語 入力
-	public synchronized void setLang(int lang){
-		this.lang = lang;
+	public static void setLang(int lang){
+		JCalendar.lang = lang;
 	}
 
 	// 表示
-	public synchronized void print(){
+	public static void print(){
 		if(lang == 0) output.JAPANESE.print();
 		else output.ENGLISH.print();
 	}
 
 	// 表示
-	public synchronized void print(int lang){
+	public static void print(int lang){
 		if(lang == 0) output.JAPANESE.print();
 		else output.ENGLISH.print();
 	}
 
 	// 年 出力
-	public synchronized int getYEAR(){
+	public static int getYEAR(){
 		return year;
 	}
 
 	// 月 出力
-	public synchronized int getMONTH(){
+	public static int getMONTH(){
 		return month;
 	}
 
 	// 日 出力
-	public synchronized int getDATE(){
+	public static int getDATE(){
 		return date;
 	}
 
 	// 曜日 出力
-	public synchronized int getDAY(){
+	public static int getDAY(){
 		return day;
 	}
 
 	// 時 出力
-	public synchronized int getHOUR(){
+	public static int getHOUR(){
 		return hour;
 	}
 
 	// 分 出力
-	public synchronized int getMINUTE(){
+	public static int getMINUTE(){
 		return minute;
 	}
 
 	// 秒 出力
-	public synchronized int getSECOND(){
+	public static int getSECOND(){
 		return second;
 	}
-
-	// 安全停止
-	public synchronized void stopSafety(){
-		bool = false;
-	}
-
 }

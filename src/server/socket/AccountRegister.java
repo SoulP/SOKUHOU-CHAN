@@ -1,121 +1,172 @@
 package server.socket;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.security.PublicKey;
-import java.util.List;
 
 import cipher.JCipher;
 import cipher.JCipher.cipher;
-import cipher.JDecrypt;
 import cipher.JEncrypt;
+import data.Packet;
+import exception.UserException;
+import io.JCalendar;
+import io.JSocket;
 
 public class AccountRegister extends JSocket{
 	// インスタンス変数
-	private byte[] data;
-	protected WatchDogTimer wdt;
-	protected PublicKey clientPublicKey;// クライアントの公開鍵
+	public		String			clientIP;			// クライアントのIPアドレス
+	public		String			clientHostName;		// クライアントのホスト名
+	public		int				clientPort;			// クライアントのポート番号
+	protected	WatchDogTimer	wdt;				// ウォッチドッグタイマ
+	protected	PublicKey		clientPublicKey;	// クライアントの公開鍵
+	private		int				id;					// オブジェクトID
 
 	// コンストラクタ
-	public AccountRegister(){
-		data = null;
-		wdt = null;
+	public AccountRegister(Socket socket, Packet packet, WatchDogTimer wdt) throws IOException{
+		super(socket);
+		this.packet = packet;
+		this.wdt	= wdt;
+		id			= 1;
 	}
 
-	// コンストラクタ
-	public AccountRegister(List<String> info){
-		data = null;
-		setInfo(info);
-		wdt = null;
-	}
-
-	// コンストラクタ
-	public AccountRegister(byte[] data){
-		this.data = data;
-		wdt = null;
-	}
-
-	// コンストラクタ
-	public AccountRegister(List<String> info, byte[] data){
-		this.data = data;
-		setInfo(info);
-		wdt = null;
-	}
-
-	// スレッド
+	// 実行
 	public void run(){
 		try {
-			if(wdt == null) throw new Exception("Error: WatchDogTimer wdt is null.");// ウォッチドッグタイマがnullの場合、エラー発生させる
-			// バイト列のデータを文字列に変換
-			String strData = bytes2str(data);
+			// 例外処理
+			if(socket	== null) throw new UserException("ソケットがありません");
+			if(packet	== null) throw new UserException("パケットがありません");
+			if(wdt		== null) throw new UserException("ウォッチドッグタイマがありません");
 
-			wdt.success();// 監視終了
-			if(wdt.isAlive()) wdt.join();// 監視終了待ち
+			Thread wdtTH	= new Thread(wdt);
+			JEncrypt enc	= new JEncrypt(cipher.RSA, packet.publicKEY);
+			Thread encTH	= new Thread(enc);
+			secretKEY		= enc.getSecretKey();
+			enc.setBytes(JCipher.secretKey2bytes(secretKEY));
+			encTH.start();
+			packet			= new Packet(this);
+			packet.controll	= ctrl.WRITE;
+			packet.dataTYPE	= type.DATA;
+			encTH.join();
+			packet.bytesKEY	= enc.getBytes();
+			send(packet);
 
-			// 確認
-			if(!strData.equals("$REGISTER:USER;")){// 異なる場合
-				sendBoolean(false);
-				super.check = false;
+			packet			= (Packet) recvObject();
+			wdtTH.start();
+
+			user = packet.user;
+			user.unpack(secretKEY);
+
+			// 蔵 情報
+			clientIP		= getSenderIPaddress();	// 送信元のIPアドレス取得
+			clientHostName	= getSenderHostName();	// 送信元のホスト名取得
+			clientPort		= getSenderPort();		// 送信元のポート番号取得
+			JCalendar.print();
+			System.out.println("IPaddr: " + clientIP + " HostName: " + clientHostName + "Port: " + clientPort + "; AccountRegister: start register");
+			System.out.println();
+
+			// 例外処理
+			if(user.name		== null || user.name.equals("")){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
 				return;
 			}
 
-			// クライアントにtrue送信
-			sendBoolean(true);
+			if(user.email		== null || user.email.equals("")){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
 
-			// 受信
-			data = recv("0000");// クライアントの公開鍵のバイト列取得
+			if(user.password	== null || user.password.equals("")){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
 
-			wdt.start();// 監視開始
+			if(user.birthday	== null || user.birthday.equals("")){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
 
-			clientPublicKey = JCipher.bytes2publicKey(data);// バイト列を公開鍵に変換
-			JEncrypt enc = new JEncrypt(cipher.RSA, clientPublicKey);// 暗号化
-			setSecretKey(enc.getSecretKey());// 共通鍵コピー
-			JDecrypt dec = new JDecrypt(cipher.AES, getSecretKey());// 復号化
-			byte[] key = JCipher.secretKey2bytes(getSecretKey());// 共通鍵をバイト列に変換
+			if(!checkName(user.name)){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
 
-			// 暗号化
-			enc.setBytes(key);// バイト列 入力
-			enc.start();// 暗号化開始
-			enc.join();// 暗号化終了待ち
+			if(!checkEmail(user.email)){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
 
-			key = enc.getBytes();// 暗号化したバイト列 出力
+			if(!checkPassword(user.password)){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
 
-			// 共通鍵をクライアントに送信
-			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			buildBytes(key);// 公開鍵のバイト列を使って、送信用バイト列に構築する
+			if(!checkBirthday(user.birthday)){
+				wdt.success();
+				wdtTH.join();
+				send(false);
+				send("");
+				close();
+				return;
+			}
+
+// データベース操作
+
 			wdt.success();
-			if(wdt.isAlive()) wdt.join();
-			send(getAllBytes());// 構築したバイト列を送信する
+			wdtTH.join();
 
-			while(!recvBoolean());// クライアント待ち
-			wdt.start();// 監視開始
-
-			// 接続番号と接続鍵の発行
-			setConnectionNO(randomNO(4));// 接続番号
-			setConnectionKEY(randomNO(4));// 接続鍵
-
-			// 送信データ作成
-			createInfoBytes("0000", ctrl.WRITE, type.USER);// 接続情報をバイト列に出力する
-			strTEMP = getConnectionNO() + "" + getConnectionKEY();// 接続番号と接続鍵を文字列にし、一時的保管
-			buildBytes(str2bytes(strTEMP));// バイト列に変換し、構築する
-			wdt.success();// 監視終了
-			if(wdt.isAlive()) wdt.join();// 監視終了待ち
-			send();// 送信
-
-			setConnectionNO(nextConnect());
-			//
-
-			enc = new JEncrypt(cipher.AES, getSecretKey());
-			//
-
+check = true;// テスト用
+String tempERROR = "test";// テスト用
+			if(!check){
+				send(false);
+				send(tempERROR);
+			}else send(true);
+			close();
 		} catch (Exception e) {
-			// エラー
-			System.out.println(e);// エラー表示
-			e.printStackTrace();// エラー原因追跡表示
+			// エラー表示
+			System.out.println(e);
+			e.printStackTrace();
+			try {
+				close();
+			} catch (IOException e1) {
+				// エラー表示
+				System.out.println(e1);
+				e1.printStackTrace();
+				socket	= null;
+			}
 		}
 	}
 
-	// ウォッチドッグタイマ 入力
-	public void setWatchDogTimer(WatchDogTimer wdt){
-		this.wdt = wdt;
+	@Override
+	public int getID() {
+		// TODO 自動生成されたメソッド・スタブ
+		return id;
 	}
-
 }

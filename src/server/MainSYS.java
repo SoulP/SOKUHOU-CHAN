@@ -33,7 +33,7 @@ public class MainSYS {
 			command.start();
 			while(command.bool()){
 				Socket socket = server.accept();
-				new Service(socket).start();
+				new Thread(new Service(socket)).start();
 			}
 		}catch (Exception e){
 			System.out.println(e);

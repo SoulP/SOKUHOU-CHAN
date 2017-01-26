@@ -23,9 +23,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.EventListenerList;
 
+import io.JSocket;
 import sokuhou.event.LangEvent;
 import sokuhou.event.EventListener.LangEventListener;
-import sokuhou.socket.JSocket;
 import sokuhou.socket.Send;
 
 // QRコード表示
@@ -184,15 +184,9 @@ public class QRcodeViewer extends JFrame implements WindowListener, ActionListen
 					Send send = (Send)sokuhou.MainSYS.socket;
 					send.setSend("$OTP:" + text.getText() + ";");
 					send.setDataType(JSocket.type.USER);
-					send.start();
-					try {
-						send.join();
-						if(send.check()) setVisible(false);// 送信成功した場合
-						else text.setText(str02);// 送信失敗した場合
-					} catch (InterruptedException e1) {
-						System.out.println(e1);// エラー内容表示
-						e1.printStackTrace();// 原因追跡表示
-					}
+					send.run();
+					if(send.check()) setVisible(false);// 送信成功した場合
+					else text.setText(str02);// 送信失敗した場合
 				}else{// 文字列に問題ある場合
 					text.setText(str01);
 				}

@@ -2,6 +2,7 @@ package sokuhou.socket;
 
 import cipher.JCipher;
 import cipher.JEncrypt;
+import io.JSocket;
 import sokuhou.MainSYS;
 
 public class Logout extends JSocket{

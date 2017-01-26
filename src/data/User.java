@@ -14,40 +14,42 @@ import io.JCalendar;
 
 public class User implements Serializable{
 	// 一時的な変数
-	public	transient String					name;		// 名前
-	public	transient String					email;		// メールアドレス
-	public	transient String					password;	// パスワード
-	public	transient String					birthday;	// 誕生日
-	public	transient byte						permission;	// パーミッション
-			transient byte[]					bNAME;		// 名前
-			transient byte[]					bEMAIL;		// メールアドレス
-			transient byte[]					bPASSWORD;	// パスワード
-			transient byte[]					bBIRTHDAY;	// 誕生日
-			transient byte[]					time;		// 日時
-			transient String					ipAddress;	// IPアドレス
-			transient String					hostName;	// ホスト名
-			transient int						port;		// ポート番号
-			transient int						year,		// 年
-												month,		// 月
-												date,		// 日
-												day,		// 曜日
-												hour,		// 時
-												minute,		// 分
-												second;		// 秒
-			transient ArrayList<ArrayList<?>>	packInfo;	// 書庫の詳細
-			transient ArrayList<String>			packName;	// 書庫の詳細 変数名
-			transient ArrayList<Integer>		packLength;	// 書庫の詳細 長さ
-			transient ArrayList<String>			packHash;	// 書庫の詳細 変数の値のハッシュコード
-			transient byte[]					packTemp;	// 一時的な書庫
-			transient byte[]					tempBytes;	// 一時的なバイト列
-			transient JCalendar					calendar;	// カレンダー
+	public				transient	String					name;		// 名前
+	public				transient	String					email;		// メールアドレス
+	public				transient	String					password;	// パスワード
+	public				transient	String					birthday;	// 誕生日
+	public				transient	byte					permission;	// パーミッション
+						transient	byte[]					bNAME;		// 名前
+						transient	byte[]					bEMAIL;		// メールアドレス
+						transient	byte[]					bPASSWORD;	// パスワード
+						transient	byte[]					bBIRTHDAY;	// 誕生日
+						transient	byte[]					time;		// 日時
+						transient	String					ipAddress;	// IPアドレス
+						transient	String					hostName;	// ホスト名
+						transient	int						port;		// ポート番号
+	public	volatile	transient	int						year,		// 年
+															month,		// 月
+															date,		// 日
+															day,		// 曜日
+															hour,		// 時
+															minute,		// 分
+															second;		// 秒
+						transient	ArrayList<ArrayList<?>>	packInfo;	// 書庫の詳細
+						transient	ArrayList<String>		packName;	// 書庫の詳細 変数名
+						transient	ArrayList<Integer>		packLength;	// 書庫の詳細 長さ
+						transient	ArrayList<String>		packHash;	// 書庫の詳細 変数の値のハッシュコード
+			volatile	transient	byte[]					packTemp;	// 一時的な書庫
+			volatile	transient	byte[]					tempBytes;	// 一時的なバイト列
 
 	// 送受信用
-	public byte[] pack;		// 書庫 (AESの共通鍵で暗号化)
-	public byte[] info;		// 書庫の詳細 (AESの共通鍵で暗号化)
-	public String packHASH;	// 書庫のハッシュコード
-	public String infoHASH;	// 書庫の詳細のハッシュコード
-	public String otp;		// ワンタイムパスワード 暗号化不要
+	public	volatile				byte[]					pack;		// 書庫 (AESの共通鍵で暗号化)
+	public	volatile				byte[]					info;		// 書庫の詳細 (AESの共通鍵で暗号化)
+	public	volatile				byte[]					packIV;		// 書庫のIV
+	public	volatile				byte[]					infoIV;		// 書庫の詳細情報のIV
+	public							String					packHASH;	// 書庫のハッシュコード
+	public							String					infoHASH;	// 書庫の詳細のハッシュコード
+	public							String					otp;		// ワンタイムパスワード 暗号化不要
+	public							String					code;		// 認証コード
 
 	// コンストラクタ
 	public User(){
@@ -57,7 +59,6 @@ public class User implements Serializable{
 		packName   = new ArrayList<String>();
 		packLength = new ArrayList<Integer>();
 		packHash   = new ArrayList<String>();
-		calendar   = new JCalendar();
 		time       = new byte[8];
 	}
 
@@ -69,14 +70,14 @@ public class User implements Serializable{
 		bPASSWORD	 = !isEmpty(password)?	Converter.string2bytes(password)	: null;
 		bBIRTHDAY	 = !isEmpty(birthday)?	Converter.string2bytes(birthday)	: null;
 		// 日時
-		calendar.time();								// 日時取得
-		year		 = calendar.getYEAR();				// 年を取得
-		month		 = calendar.getMONTH();				// 月を取得
-		date		 = calendar.getDATE();				// 日を取得
-		day			 = calendar.getDAY();				// 曜日を取得
-		hour		 = calendar.getHOUR();				// 時を取得
-		minute		 = calendar.getMINUTE();			// 分を取得
-		second		 = calendar.getSECOND();			// 秒を取得
+		JCalendar.getTime();							// 日時取得
+		year		 = JCalendar.getYEAR();				// 年を取得
+		month		 = JCalendar.getMONTH();			// 月を取得
+		date		 = JCalendar.getDATE();				// 日を取得
+		day			 = JCalendar.getDAY();				// 曜日を取得
+		hour		 = JCalendar.getHOUR();				// 時を取得
+		minute		 = JCalendar.getMINUTE();			// 分を取得
+		second		 = JCalendar.getSECOND();			// 秒を取得
 		time[0]		 = (byte) ((year >>> 8) & 0xFF);	// 日時 (int→byte変換)
 		time[1]		 = (byte)  (year        & 0xFF);	// 同上
 		time[2]		 = (byte)  (month       & 0x0F);	// 同上
@@ -158,48 +159,48 @@ public class User implements Serializable{
 	}
 
 	// 書庫作成 + 暗号化, 出力 IVのバイト列
-	public byte[] pack(Key key) throws UserException{
+	public void pack(Key key) throws UserException{
 		// 例外処理
 		if(key == null) throw new NullUserException("共通鍵がありません");
 
-		pack();																	// 書庫作成
-		tempBytes	= Converter.object2bytes(packInfo);							// 配列コピー
-		infoHASH	= JCipher.toHashCode(JCipher.hash.SHA512, tempBytes);		// バイト列からハッシュコードに変換
-		int length	= tempBytes.length;											// 配列数取得
-		length	 	= (length % 16 == 0)? length + 16 : length / 16 * 16 + 16;	// 16バイトのブロック単位に調整
-		info		= new byte[length + 16];									// バイト列作成
+		pack();																		// 書庫作成
+		tempBytes	= Converter.object2bytes(packInfo);								// 配列コピー
+		infoHASH	= JCipher.toHashCode(JCipher.hash.SHA512, tempBytes);			// バイト列からハッシュコードに変換
+		int length	= tempBytes.length;												// 配列数取得
+		length	 	= (length % 16 == 0)? length + 16 : length / 16 * 16 + 16;		// 16バイトのブロック単位に調整
+		info		= new byte[length + 16];										// バイト列作成
 		// 乱数で埋める
 		for(int i = 0; i < info.length; i++) info[i] = (byte) ((int) (Math.random() * 10000 % 0x7F) & 0xFF);
-		System.arraycopy(tempBytes, 0, info, 0, tempBytes.length);				// 配列コピー
+		System.arraycopy(tempBytes, 0, info, 0, tempBytes.length);					// 配列コピー
 
 		// 最後の所に配列数の値を入れる
-		info[info.length - 4] = (byte) (tempBytes.length >>> 24 & 0xFF);		// 配列数 (int→byte変換)
-		info[info.length - 3] = (byte) (tempBytes.length >>> 16 & 0xFF);		// 同上
-		info[info.length - 2] = (byte) (tempBytes.length >>> 8  & 0xFF);		// 同上
-		info[info.length - 1] = (byte) (tempBytes.length 		& 0xFF);		// 同上
+		info[info.length - 4] = (byte) (tempBytes.length >>> 24 & 0xFF);			// 配列数 (int→byte変換)
+		info[info.length - 3] = (byte) (tempBytes.length >>> 16 & 0xFF);			// 同上
+		info[info.length - 2] = (byte) (tempBytes.length >>> 8  & 0xFF);			// 同上
+		info[info.length - 1] = (byte) (tempBytes.length 		& 0xFF);			// 同上
 
-		tempBytes = new byte[info.length];										// バイト列作成
-		System.arraycopy(info, 0, tempBytes, 0, info.length);					// 配列コピー
+		tempBytes = new byte[info.length];											// バイト列作成
+		System.arraycopy(info, 0, tempBytes, 0, info.length);						// 配列コピー
 
 		// ここから暗号化処理
 		try{
-			JEncrypt enc	= new JEncrypt(JCipher.cipher.AES, key, tempBytes);	// 暗号化
-			enc.setBytes(tempBytes);											// バイト列 入力
-			enc.start();														// 暗号化開始
-			packHASH		= JCipher.toHashCode(JCipher.hash.SHA512, packTemp);// バイト列からハッシュコードに変換
-			enc.join();															// 終了待ち
-			info			= enc.getBytes();									// 暗号化したバイト列 出力
-			tempBytes		= enc.getIV();										// IV 出力
-			enc				= new JEncrypt(JCipher.cipher.AES, key, packTemp);	// 暗号化作成し直し (デッドロック回避)
-			enc.setIV(tempBytes);												// IV 入力
-			enc.start();														// 暗号化開始
-			enc.join();															// 終了待ち
-			pack			= enc.getBytes();									// 暗号化したバイト列 出力
-			return tempBytes;													// IV 出力
+			infoHASH		= JCipher.toHashCode(JCipher.hash.SHA512, tempBytes);	// ハッシュコード取得
+			packHASH 		= JCipher.toHashCode(JCipher.hash.SHA512, packTemp);	// ハッシュコード取得
+			JEncrypt enc1	= new JEncrypt(JCipher.cipher.AES, key, tempBytes);		// 暗号化
+			JEncrypt enc2	= new JEncrypt(JCipher.cipher.AES, key, packTemp);		// 暗号化
+			Thread encTH1	= new Thread(enc1);										// スレッド
+			Thread encTH2	= new Thread(enc2);										// スレッド
+			encTH1.start();															// 暗号化開始
+			encTH2.start();															// 暗号化開始
+			encTH1.join();															// 終了待ち
+			encTH2.join();															// 終了待ち
+			info			= enc1.getBytes();										// 暗号化したバイト列 出力
+			infoIV			= enc1.getIV();											// IV取得
+			pack			= enc2.getBytes();										// 暗号化したバイト列 出力
+			packIV			= enc2.getIV();											// IV取得
 		} catch (InterruptedException e) {
-			System.out.println(e);												// エラー表示
-			e.printStackTrace();												// エラー原因追跡表示
-			return null;														// null値 出力
+			System.out.println(e);													// エラー表示
+			e.printStackTrace();													// エラー原因追跡表示
 		} finally {
 			// 初期化
 			packInfo		= null;
@@ -234,6 +235,7 @@ public class User implements Serializable{
 					length += bNAME.length;
 					hash = JCipher.toHashCode(JCipher.hash.SHA512, bNAME);
 					if(!hash.equals(packInfo.get(2).get(i))) throw new VerifyUserException("ハッシュコード確認エラー: 名前");
+					name = Converter.bytes2string(bNAME);
 					break;
 				case "bEMAIL"		:
 					bEMAIL = new byte[(Integer) packInfo.get(1).get(i)];
@@ -241,6 +243,7 @@ public class User implements Serializable{
 					length += bEMAIL.length;
 					hash = JCipher.toHashCode(JCipher.hash.SHA512, bEMAIL);
 					if(!hash.equals(packInfo.get(2).get(i))) throw new VerifyUserException("ハッシュコード確認エラー: メールアドレス");
+					email = Converter.bytes2string(bEMAIL);
 					break;
 				case "bPASSWORD"	:
 					bPASSWORD = new byte[(Integer) packInfo.get(1).get(i)];
@@ -248,6 +251,7 @@ public class User implements Serializable{
 					length += bPASSWORD.length;
 					hash = JCipher.toHashCode(JCipher.hash.SHA512, bPASSWORD);
 					if(!hash.equals(packInfo.get(2).get(i))) throw new VerifyUserException("ハッシュコード確認エラー: パスワード");
+					password = Converter.bytes2string(bPASSWORD);
 					break;
 				case "bBIRTHDAY"	:
 					bBIRTHDAY = new byte[(Integer) packInfo.get(1).get(i)];
@@ -255,6 +259,7 @@ public class User implements Serializable{
 					length += bBIRTHDAY.length;
 					hash = JCipher.toHashCode(JCipher.hash.SHA512, bBIRTHDAY);
 					if(!hash.equals(packInfo.get(2).get(i))) throw new VerifyUserException("ハッシュコード確認エラー: 誕生日");
+					birthday = Converter.bytes2string(bBIRTHDAY);
 					break;
 				case "time"			:
 					time = new byte[(Integer) packInfo.get(1).get(i)];
@@ -278,27 +283,29 @@ public class User implements Serializable{
 	}
 
 	// 書庫解凍
-	public void unpack(Key key, byte[] iv) throws UserException{
+	public void unpack(Key key) throws UserException{
 		// 例外処理
+		if(key		== null)						throw new NullUserException("共通鍵がありません");
 		if(pack		== null)						throw new NullUserException("書庫がありません");
 		if(info		== null)						throw new NullUserException("書庫の詳細情報がありません");
 		if(packHASH == null || packHASH.equals(""))	throw new NullUserException("書庫のハッシュコードがありません");
 		if(infoHASH == null || infoHASH.equals(""))	throw new NullUserException("書庫の詳細情報のハッシュコードがありません");
-		if(key		== null)						throw new NullUserException("共通鍵がありません");
-		if(iv		== null)						throw new NullUserException("IVがありません");
+		if(packIV	== null)						throw new NullUserException("書庫のIVがありません");
+		if(infoIV	== null)						throw new NullUserException("書庫の詳細情報のIVがありません");
 		// 復号化
 		try{
-			JDecrypt dec = new JDecrypt(JCipher.cipher.AES, key, pack);			// 復号化
-			dec.setIV(iv);														// IV 入力
-			dec.start();														// 復号化開始
-			dec.join();															// 終了待ち
-			packTemp = dec.getBytes();											// 復号化したバイト列 出力
-			dec = new JDecrypt(JCipher.cipher.AES, key, info);					// 復号化作成し直し (デッドロック回避)
-			dec.setIV(iv);														// IV 入力
-			dec.start();														// 復号化開始
-			dec.join();															// 終了待ち
-			tempBytes = dec.getBytes();											// 復号化したバイト列 出力
-
+			JDecrypt dec1 = new JDecrypt(JCipher.cipher.AES, key, pack);		// 復号化
+			JDecrypt dec2 = new JDecrypt(JCipher.cipher.AES, key, info);		// 復号化
+			dec1.setIV(packIV);													// IV 入力
+			dec2.setIV(infoIV);													// IV 入力
+			Thread decTH1 = new Thread(dec1);									// スレッド
+			Thread decTH2 = new Thread(dec2);									// スレッド
+			decTH1.start();														// 復号化開始
+			decTH2.start();														// 復号化開始
+			decTH1.join();														// 終了待ち
+			decTH2.join();														// 終了待ち
+			packTemp = dec1.getBytes();											// 復号化したバイト列 出力
+			tempBytes = dec2.getBytes();										// 復号化したバイト列 出力
 			int length = 0;														// 初期設定
 			length  = tempBytes[tempBytes.length - 4] << 24 & 0xFF000000;		// 書庫の詳細情報の配列数 (byte→int変換)
 			length += tempBytes[tempBytes.length - 3] << 16 & 0x00FF0000;		// 同上
@@ -307,7 +314,6 @@ public class User implements Serializable{
 			byte[] temp = new byte[length];										// バイト列作成
 			System.arraycopy(tempBytes, 0, temp, 0, length);					// 配列コピー
 			tempBytes = temp;													// 参照値コピー
-
 			unpack();															// 書庫解凍
 
 		}catch (InterruptedException e){
@@ -332,10 +338,5 @@ public class User implements Serializable{
 	// 空の状態確認
 	private boolean isEmpty(String str){
 		return (str == null || str.equals(""))? true : false;
-	}
-
-	// 空の状態確認
-	private boolean isEmpty(int num){
-		return (num == -1)? true : false;
 	}
 }

@@ -7,6 +7,7 @@ import cipher.JCipher;
 import cipher.JDecrypt;
 import cipher.JEncrypt;
 import cipher.JCipher.cipher;
+import io.JSocket;
 import sokuhou.MainSYS;
 
 public class Login extends JSocket{

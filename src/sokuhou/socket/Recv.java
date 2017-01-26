@@ -3,6 +3,7 @@ package sokuhou.socket;
 import cipher.JCipher;
 import cipher.JDecrypt;
 import cipher.JEncrypt;
+import io.JSocket;
 import sokuhou.MainSYS;
 
 public class Recv extends JSocket{

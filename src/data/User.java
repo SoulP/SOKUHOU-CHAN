@@ -11,8 +11,9 @@ import exception.NullUserException;
 import exception.UserException;
 import exception.VerifyUserException;
 import io.JCalendar;
+import io.JPack;
 
-public class User implements Serializable{
+public class User implements JPack, Serializable{
 	// 一時的な変数
 	public				transient	String					name;		// 名前
 	public				transient	String					email;		// メールアドレス
@@ -159,31 +160,18 @@ public class User implements Serializable{
 	}
 
 	// 書庫作成 + 暗号化, 出力 IVのバイト列
-	public void pack(Key key) throws UserException{
-		// 例外処理
-		if(key == null) throw new NullUserException("共通鍵がありません");
-
-		pack();																		// 書庫作成
-		tempBytes	= Converter.object2bytes(packInfo);								// 配列コピー
-		infoHASH	= JCipher.toHashCode(JCipher.hash.SHA512, tempBytes);			// バイト列からハッシュコードに変換
-		int length	= tempBytes.length;												// 配列数取得
-		length	 	= (length % 16 == 0)? length + 16 : length / 16 * 16 + 16;		// 16バイトのブロック単位に調整
-		info		= new byte[length + 16];										// バイト列作成
-		// 乱数で埋める
-		for(int i = 0; i < info.length; i++) info[i] = (byte) ((int) (Math.random() * 10000 % 0x7F) & 0xFF);
-		System.arraycopy(tempBytes, 0, info, 0, tempBytes.length);					// 配列コピー
-
-		// 最後の所に配列数の値を入れる
-		info[info.length - 4] = (byte) (tempBytes.length >>> 24 & 0xFF);			// 配列数 (int→byte変換)
-		info[info.length - 3] = (byte) (tempBytes.length >>> 16 & 0xFF);			// 同上
-		info[info.length - 2] = (byte) (tempBytes.length >>> 8  & 0xFF);			// 同上
-		info[info.length - 1] = (byte) (tempBytes.length 		& 0xFF);			// 同上
-
-		tempBytes = new byte[info.length];											// バイト列作成
-		System.arraycopy(info, 0, tempBytes, 0, info.length);						// 配列コピー
-
-		// ここから暗号化処理
+	@Override
+	public void pack(Key key){
 		try{
+			// 例外処理
+			if(key == null) throw new NullUserException("共通鍵がありません");
+
+			pack();																	// 書庫作成
+			tempBytes	= Converter.object2bytes(packInfo);							// 配列コピー
+			infoHASH	= JCipher.toHashCode(JCipher.hash.SHA512, tempBytes);		// バイト列からハッシュコードに変換
+			tempBytes	= JCipher.block(tempBytes, size);							// ブロック構築
+
+			// ここから暗号化処理
 			infoHASH		= JCipher.toHashCode(JCipher.hash.SHA512, tempBytes);	// ハッシュコード取得
 			packHASH 		= JCipher.toHashCode(JCipher.hash.SHA512, packTemp);	// ハッシュコード取得
 			JEncrypt enc1	= new JEncrypt(JCipher.cipher.AES, key, tempBytes);		// 暗号化
@@ -198,7 +186,7 @@ public class User implements Serializable{
 			infoIV			= enc1.getIV();											// IV取得
 			pack			= enc2.getBytes();										// 暗号化したバイト列 出力
 			packIV			= enc2.getIV();											// IV取得
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			System.out.println(e);													// エラー表示
 			e.printStackTrace();													// エラー原因追跡表示
 		} finally {
@@ -283,17 +271,18 @@ public class User implements Serializable{
 	}
 
 	// 書庫解凍
-	public void unpack(Key key) throws UserException{
-		// 例外処理
-		if(key		== null)						throw new NullUserException("共通鍵がありません");
-		if(pack		== null)						throw new NullUserException("書庫がありません");
-		if(info		== null)						throw new NullUserException("書庫の詳細情報がありません");
-		if(packHASH == null || packHASH.equals(""))	throw new NullUserException("書庫のハッシュコードがありません");
-		if(infoHASH == null || infoHASH.equals(""))	throw new NullUserException("書庫の詳細情報のハッシュコードがありません");
-		if(packIV	== null)						throw new NullUserException("書庫のIVがありません");
-		if(infoIV	== null)						throw new NullUserException("書庫の詳細情報のIVがありません");
-		// 復号化
+	@Override
+	public void unpack(Key key){
 		try{
+			// 例外処理
+			if(key		== null)						throw new NullUserException("共通鍵がありません");
+			if(pack		== null)						throw new NullUserException("書庫がありません");
+			if(info		== null)						throw new NullUserException("書庫の詳細情報がありません");
+			if(packHASH == null || packHASH.equals(""))	throw new NullUserException("書庫のハッシュコードがありません");
+			if(infoHASH == null || infoHASH.equals(""))	throw new NullUserException("書庫の詳細情報のハッシュコードがありません");
+			if(packIV	== null)						throw new NullUserException("書庫のIVがありません");
+			if(infoIV	== null)						throw new NullUserException("書庫の詳細情報のIVがありません");
+			// 復号化
 			JDecrypt dec1 = new JDecrypt(JCipher.cipher.AES, key, pack);		// 復号化
 			JDecrypt dec2 = new JDecrypt(JCipher.cipher.AES, key, info);		// 復号化
 			dec1.setIV(packIV);													// IV 入力
@@ -316,7 +305,7 @@ public class User implements Serializable{
 			tempBytes = temp;													// 参照値コピー
 			unpack();															// 書庫解凍
 
-		}catch (InterruptedException e){
+		}catch (Exception e){
 			System.out.println(e);
 			e.printStackTrace();
 		} finally {

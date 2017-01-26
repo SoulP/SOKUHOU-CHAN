@@ -16,7 +16,7 @@ import io.JSocket;
 
 public class AccountRegister extends JSocket{
 	// インスタンス変数
-	ResourceBundle	rb = sokuhou.MainSYS.lang.getResBundle();	// 言語
+	ResourceBundle	rb = sokuhou.MainSYS.lang.getResBundle(); // 言語
 
 	// コンストラクタ
 	public AccountRegister() throws IOException{

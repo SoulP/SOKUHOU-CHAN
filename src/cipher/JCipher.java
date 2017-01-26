@@ -222,4 +222,21 @@ public abstract class JCipher implements Runnable{
 			return null;
 		}
 	}
+
+	// ブロックサイズ構築
+	public static byte[] block(byte[] bytes, int size){
+		int length = bytes.length;
+		length = (length % size == 0)? length + size : length / size * size + size;		// 長さ調整
+		length += (size < 4)? (int)(Math.ceil((4.0d / (double)size)) * 4) : size;		// 同上
+		byte[] tempBYTES = new byte[length];											// バイト列作成
+		// 乱数で埋める
+		for(int i = 0; i < tempBYTES.length; i++) tempBYTES[i] = (byte) ((int) (Math.random() * 10000 % 0x7F) & 0xFF);
+		System.arraycopy(bytes, 0, tempBYTES, 0, bytes.length);
+		// 最後の所に配列数の値を入れる
+		tempBYTES[tempBYTES.length - 4] = (byte) (bytes.length >>> 24 & 0xFF);			// 配列数 (int→byte変換)
+		tempBYTES[tempBYTES.length - 3] = (byte) (bytes.length >>> 16 & 0xFF);			// 同上
+		tempBYTES[tempBYTES.length - 2] = (byte) (bytes.length >>> 8  & 0xFF);			// 同上
+		tempBYTES[tempBYTES.length - 1] = (byte) (bytes.length 		& 0xFF);			// 同上
+		return tempBYTES;
+	}
 }

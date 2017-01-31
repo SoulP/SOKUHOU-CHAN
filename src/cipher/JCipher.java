@@ -239,4 +239,16 @@ public abstract class JCipher implements Runnable{
 		tempBYTES[tempBYTES.length - 1] = (byte) (bytes.length 		& 0xFF);			// 同上
 		return tempBYTES;
 	}
+
+	// ブロックサイズ構築
+	public static byte[] unblock(byte[] bytes){
+		int length = 0;															// 初期設定
+		length  = bytes[bytes.length - 4] << 24 & 0xFF000000;			// 書庫の詳細情報の配列数 (byte→int変換)
+		length += bytes[bytes.length - 3] << 16 & 0x00FF0000;			// 同上
+		length += bytes[bytes.length - 2] <<  8 & 0x0000FF00;			// 同上
+		length += bytes[bytes.length - 1]       & 0x000000FF;			// 同上
+		byte[] tempBYTES = new byte[length];
+		System.arraycopy(bytes, 0, tempBYTES, 0, length);
+		return tempBYTES;
+	}
 }

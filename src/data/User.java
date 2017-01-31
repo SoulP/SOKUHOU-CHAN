@@ -164,7 +164,7 @@ public class User implements JPack, Serializable{
 	public void pack(Key key){
 		try{
 			// 例外処理
-			if(key == null) throw new NullUserException("共通鍵がありません");
+			if(key == null) throw new NullUserException("鍵がありません");
 
 			pack();																	// 書庫作成
 			tempBytes	= Converter.object2bytes(packInfo);							// 配列コピー
@@ -275,7 +275,7 @@ public class User implements JPack, Serializable{
 	public void unpack(Key key){
 		try{
 			// 例外処理
-			if(key		== null)						throw new NullUserException("共通鍵がありません");
+			if(key		== null)						throw new NullUserException("鍵がありません");
 			if(pack		== null)						throw new NullUserException("書庫がありません");
 			if(info		== null)						throw new NullUserException("書庫の詳細情報がありません");
 			if(packHASH == null || packHASH.equals(""))	throw new NullUserException("書庫のハッシュコードがありません");
@@ -283,28 +283,17 @@ public class User implements JPack, Serializable{
 			if(packIV	== null)						throw new NullUserException("書庫のIVがありません");
 			if(infoIV	== null)						throw new NullUserException("書庫の詳細情報のIVがありません");
 			// 復号化
-			JDecrypt dec1 = new JDecrypt(JCipher.cipher.AES, key, pack);		// 復号化
-			JDecrypt dec2 = new JDecrypt(JCipher.cipher.AES, key, info);		// 復号化
-			dec1.setIV(packIV);													// IV 入力
-			dec2.setIV(infoIV);													// IV 入力
-			Thread decTH1 = new Thread(dec1);									// スレッド
-			Thread decTH2 = new Thread(dec2);									// スレッド
-			decTH1.start();														// 復号化開始
-			decTH2.start();														// 復号化開始
-			decTH1.join();														// 終了待ち
-			decTH2.join();														// 終了待ち
-			packTemp = dec1.getBytes();											// 復号化したバイト列 出力
-			tempBytes = dec2.getBytes();										// 復号化したバイト列 出力
-			int length = 0;														// 初期設定
-			length  = tempBytes[tempBytes.length - 4] << 24 & 0xFF000000;		// 書庫の詳細情報の配列数 (byte→int変換)
-			length += tempBytes[tempBytes.length - 3] << 16 & 0x00FF0000;		// 同上
-			length += tempBytes[tempBytes.length - 2] <<  8 & 0x0000FF00;		// 同上
-			length += tempBytes[tempBytes.length - 1]       & 0x000000FF;		// 同上
-			byte[] temp = new byte[length];										// バイト列作成
-			System.arraycopy(tempBytes, 0, temp, 0, length);					// 配列コピー
-			tempBytes = temp;													// 参照値コピー
-			unpack();															// 書庫解凍
-
+			JDecrypt dec1 = new JDecrypt(JCipher.cipher.AES, key, pack, packIV);	// 復号化
+			JDecrypt dec2 = new JDecrypt(JCipher.cipher.AES, key, info, infoIV);	// 復号化
+			Thread decTH1 = new Thread(dec1);										// スレッド
+			Thread decTH2 = new Thread(dec2);										// スレッド
+			decTH1.start();															// 復号化開始
+			decTH2.start();															// 復号化開始
+			decTH1.join();															// 終了待ち
+			decTH2.join();															// 終了待ち
+			packTemp = dec1.getBytes();												// 復号化したバイト列 出力
+			tempBytes = JCipher.unblock(dec2.getBytes());							// 復号化したバイト列 出力
+			unpack();																// 書庫解凍
 		}catch (Exception e){
 			System.out.println(e);
 			e.printStackTrace();

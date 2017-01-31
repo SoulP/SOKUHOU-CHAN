@@ -47,6 +47,16 @@ public class JEncrypt extends JCipher{
 		this.bytes = bytes;// bytesからコピー
 	}
 
+	// コンストラクタ
+	public JEncrypt(cipher type, Key key, byte[] bytes, byte[] iv){
+		// 初期化
+		super();
+		this.type = type;// typeからコピー
+		this.key = key;// keyからコピー
+		this.bytes = bytes;// bytesからコピー
+		setIV(iv);
+	}
+
 	// 暗号化のアルゴリズム 入力
 	public void setType(cipher type){
 		this.type = type;

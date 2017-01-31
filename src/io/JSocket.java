@@ -250,7 +250,7 @@ public abstract class JSocket implements OID{
 	}
 
 	// 名前確認
-	public boolean checkName(String str){
+	public static boolean checkName(String str){
 		if(str == null) return false;
 		Pattern pattern = Pattern.compile("^(\\p{Alnum}|\\p{InHiragana}|\\p{InKatakana}|\\p{InCJKUnifiedIdeographs}|[\\u0020\\u3000\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A])+$");
 		Matcher matcher = pattern.matcher(str);
@@ -258,7 +258,7 @@ public abstract class JSocket implements OID{
 	}
 
 	// メールアドレス確認
-	public boolean checkEmail(String str){
+	public static boolean checkEmail(String str){
 		if(str == null) return false;
 		Pattern pattern = Pattern.compile("^\\p{Alnum}+@\\p{Alnum}*\\.?\\p{Alnum}+\\.\\p{Alnum}+$");
 		Matcher matcher = pattern.matcher(str);
@@ -266,7 +266,7 @@ public abstract class JSocket implements OID{
 	}
 
 	// パスワード確認
-	public boolean checkPassword(String str){
+	public static boolean checkPassword(String str){
 		if(str == null) return false;
 		Pattern pattern = Pattern.compile("\\s|[^ -~｡-ﾟ]");
 		Matcher matcher = pattern.matcher(str);
@@ -274,7 +274,7 @@ public abstract class JSocket implements OID{
 	}
 
 	// 誕生日確認
-	public boolean checkBirthday(String str){
+	public static boolean checkBirthday(String str){
 		if(str == null) return false;
 		Pattern pattern = Pattern.compile("^\\d{4}-(1[0-2]|0[1-9])-(3[01]|2\\d|1\\d|0[1-9])+$");
 		Matcher matcher = pattern.matcher(str);

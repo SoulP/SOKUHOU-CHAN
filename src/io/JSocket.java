@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.crypto.SecretKey;
 
 import data.Data;
 import data.Option;
@@ -20,29 +18,41 @@ import data.User;
 
 public abstract class JSocket implements OID{
 	// インスタンス変数
-	public					enum				ctrl { NULL, READ, WRITE, DELETE };	// 接続情報の操作
-	public					enum				type { NULL, USER, DATA, OPTION };	// 接続情報の種類
-	public		transient	Socket				socket;								// 通信ソケット
-	public		transient	Packet				packet;								// パケット
-	public					User				user;								// ユーザー
-	public					Data				data;								// データー
-	public					Option				option;								// オプション
-	private		transient	DataOutputStream	dos;								// 送信用ストリーム
-	private		transient	DataInputStream		dis;								// 受信用ストリーム
-	private		transient	ObjectOutputStream	oos;								// 送信用ストリーム
-	private		transient	ObjectInputStream	ois;								// 受信用ストリーム
-	protected	transient	SecretKey			secretKEY;							// 共通鍵
-	protected	transient	PrivateKey			privateKEY;							// 秘密鍵
-	public					PublicKey			publicKEY;							// 公開鍵
-	protected	transient	boolean				check;								// 確認
-	protected 				int					id;									// オブジェクトID
-	public 					int					year,								// 年
-												month,								// 月
-												date,								// 日
-												day,								// 曜日
-												hour,								// 時
-												minute,								// 分
-												second;								// 秒
+	public									enum				ctrl { NULL, READ, WRITE, DELETE };	// 接続情報の操作
+	public									enum				type { NULL, USER, DATA, OPTION };	// 接続情報の種類
+	public		transient					Socket				socket;								// 通信ソケット
+	public		transient					Packet				packet;								// パケット
+	public									User				user;								// ユーザー
+	public									Data				data;								// データー
+	public									Option				option;								// オプション
+	private		transient					DataOutputStream	dos;								// 送信用ストリーム
+	private		transient					DataInputStream		dis;								// 受信用ストリーム
+	private		transient					ObjectOutputStream	oos;								// 送信用ストリーム
+	private		transient					ObjectInputStream	ois;								// 受信用ストリーム
+	protected	transient					Key					key;								// 共通鍵
+	protected	transient					PrivateKey			privateKEY;							// 秘密鍵
+	public									PublicKey			publicKEY;							// 公開鍵
+	protected	transient					boolean				check;								// 確認
+	protected 								int					id;									// オブジェクトID
+	public 									int					year,								// 年
+																month,								// 月
+																date,								// 日
+																day,								// 曜日
+																hour,								// 時
+																minute,								// 分
+																second;								// 秒
+
+																									// 名前規則
+	private		transient	static	final	Pattern				NAME_RULE		= Pattern.compile("^(\\p{Alnum}|\\p{InHiragana}|\\p{InKatakana}|\\p{InCJKUnifiedIdeographs}|[\\u0020\\u3000\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A])+$");
+
+																									// メールアドレス規則
+	private		transient	static	final	Pattern				EMAIL_RULE		= Pattern.compile("^\\p{Alnum}+@\\p{Alnum}*\\.?\\p{Alnum}+\\.\\p{Alnum}+$");
+
+																									// パスワード規則
+	private		transient	static	final	Pattern				PASSWORD_RULE	= Pattern.compile("^(\\p{Graph})+$");
+
+																									// 誕生日規則
+	private		transient	static	final	Pattern				BIRTHDAY_RULE	= Pattern.compile("^\\d{4}-(1[0-2]|0[1-9])-(3[01]|2\\d|1\\d|0[1-9])+$");
 
 	// コンストラクタ
 	public JSocket() throws IOException{
@@ -251,34 +261,23 @@ public abstract class JSocket implements OID{
 
 	// 名前確認
 	public static boolean checkName(String str){
-		if(str == null) return false;
-		Pattern pattern = Pattern.compile("^(\\p{Alnum}|\\p{InHiragana}|\\p{InKatakana}|\\p{InCJKUnifiedIdeographs}|[\\u0020\\u3000\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A])+$");
-		Matcher matcher = pattern.matcher(str);
-		return matcher.find();
+		return (str == null)? false : NAME_RULE.matcher(str).find();
 	}
 
 	// メールアドレス確認
 	public static boolean checkEmail(String str){
-		if(str == null) return false;
-		Pattern pattern = Pattern.compile("^\\p{Alnum}+@\\p{Alnum}*\\.?\\p{Alnum}+\\.\\p{Alnum}+$");
-		Matcher matcher = pattern.matcher(str);
-		return matcher.find();
+		return (str == null)? false : EMAIL_RULE.matcher(str).find();
 	}
 
 	// パスワード確認
 	public static boolean checkPassword(String str){
-		if(str == null) return false;
-		Pattern pattern = Pattern.compile("\\s|[^ -~｡-ﾟ]");
-		Matcher matcher = pattern.matcher(str);
-		return !matcher.find();
+		return (str == null)? false : PASSWORD_RULE.matcher(str).find();
 	}
 
 	// 誕生日確認
 	public static boolean checkBirthday(String str){
 		if(str == null) return false;
-		Pattern pattern = Pattern.compile("^\\d{4}-(1[0-2]|0[1-9])-(3[01]|2\\d|1\\d|0[1-9])+$");
-		Matcher matcher = pattern.matcher(str);
-		if(matcher.find()){
+		if(BIRTHDAY_RULE.matcher(str).find()){
 			JCalendar.getTime();
 			int yearMAX = JCalendar.getYEAR();
 			int yearMIN = yearMAX - 128;

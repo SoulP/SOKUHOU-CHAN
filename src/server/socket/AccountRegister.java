@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.security.PublicKey;
 
+import javax.crypto.SecretKey;
+
 import cipher.JCipher;
 import cipher.JCipher.cipher;
 import cipher.JEncrypt;
@@ -40,8 +42,8 @@ public class AccountRegister extends JSocket{
 			Thread wdtTH	= new Thread(wdt);
 			JEncrypt enc	= new JEncrypt(cipher.RSA, packet.publicKEY);
 			Thread encTH	= new Thread(enc);
-			secretKEY		= enc.getSecretKey();
-			enc.setBytes(JCipher.secretKey2bytes(secretKEY));
+			key				= enc.getSecretKey();
+			enc.setBytes(JCipher.secretKey2bytes((SecretKey) key));
 			encTH.start();
 			packet			= new Packet(this);
 			packet.controll	= ctrl.WRITE;
@@ -54,7 +56,7 @@ public class AccountRegister extends JSocket{
 			wdtTH.start();
 
 			user = packet.user;
-			user.unpack(secretKEY);
+			user.unpack(key);
 
 			// 蔵 情報
 			clientIP		= getSenderIPaddress();	// 送信元のIPアドレス取得
@@ -70,7 +72,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -79,7 +81,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -88,7 +90,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -97,7 +99,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -106,7 +108,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -115,7 +117,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -124,7 +126,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -133,7 +135,7 @@ public class AccountRegister extends JSocket{
 				wdtTH.join();
 				send(false);
 				send("");
-				close();
+				if(!socket.isClosed()) close(); // 接断
 				return;
 			}
 
@@ -148,13 +150,13 @@ String tempERROR = "test";// テスト用
 				send(false);
 				send(tempERROR);
 			}else send(true);
-			close();
+			if(!socket.isClosed()) close(); // 接断
 		} catch (Exception e) {
 			// エラー表示
 			System.out.println(e);
 			e.printStackTrace();
 			try {
-				close();
+				if(!socket.isClosed()) close(); // 接断;
 			} catch (IOException e1) {
 				// エラー表示
 				System.out.println(e1);

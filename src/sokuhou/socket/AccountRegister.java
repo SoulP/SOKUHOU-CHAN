@@ -51,7 +51,7 @@ public class AccountRegister extends JSocket{
 				send(true);														// true送信
 				while(!recvBoolean());											// 鯖の送信準備待ち
 				if(!recvBoolean()){												// 鯖へのアクセス可否確認
-					if(!socket.isClosed()) close();								// 接続が閉じられていない場合は、閉じる
+					if(!socket.isClosed()) close();								// 接断
 					// エラーダイアログ表示
 					JOptionPane.showMessageDialog(null, rb.getString("error.connect.failed"), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
 					return;
@@ -78,9 +78,9 @@ public class AccountRegister extends JSocket{
 				decTH.start();													// 復号化開始
 				decTH.join();													// 終了待ち
 
-				secretKEY			= JCipher.bytes2secretKey(dec.getBytes());	// バイト列を共通鍵に変換
+				key					= JCipher.bytes2secretKey(dec.getBytes());	// バイト列を共通鍵に変換
 
-				user.pack(secretKEY);											// 書庫作成
+				user.pack(key);													// 書庫作成
 				packet				= new Packet(this);							// パケット 作成
 				packet.user			= user;										// ユーザー 入力
 				packet.controll		= ctrl.WRITE;								// 操作 設定
@@ -89,11 +89,12 @@ public class AccountRegister extends JSocket{
 				send(packet);													// オブジェクト送信
 
 				while(!recvBoolean());											// 鯖の送信準備待ち
-				check = recvBoolean();											// 結果を受信
 
-				// 結果失敗した場合、エラーダイアログを表示
-				if(!check) JOptionPane.showMessageDialog(null, rb.getString(recvString()), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
+				// エラーダイアログ表示
+				if(!(check = recvBoolean())) JOptionPane.showMessageDialog(null, rb.getString(recvString()), rb.getString("error"), JOptionPane.ERROR_MESSAGE);
 
+				// 接断
+				if(!socket.isClosed()) close();
 			} catch (Exception e) {
 				// エラー表示
 				System.out.println(e);

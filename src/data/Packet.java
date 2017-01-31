@@ -24,7 +24,7 @@ public class Packet extends JSocket implements Serializable{
 		hour		= JCalendar.getHOUR();
 		minute		= JCalendar.getMINUTE();
 		second		= JCalendar.getSECOND();
-		secretKEY	= null;
+		key			= null;
 		privateKEY	= null;
 		publicKEY	= null;
 		user		= null;
@@ -47,7 +47,7 @@ public class Packet extends JSocket implements Serializable{
 			hour		= JCalendar.getHOUR();
 			minute		= JCalendar.getMINUTE();
 			second		= JCalendar.getSECOND();
-			secretKEY	= null;
+			key			= null;
 			privateKEY	= null;
 			publicKEY	= null;
 			user		= null;
